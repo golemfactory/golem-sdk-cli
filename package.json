@@ -1,0 +1,46 @@
+{
+  "name": "@golem-sdk/cli",
+  "version": "0.1.0",
+  "description": "CLI for Golem SDK",
+  "main": "src/main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx genversion src/lib/version.ts --es6 && tsc",
+    "watch": "npx genversion src/lib/version.ts --es6 && tsc --watch"
+  },
+  "bin": "./src/main.ts",
+  "keywords": [
+    "golem",
+    "network",
+    "distributed",
+    "computing",
+    "sdk",
+    "internet",
+    "computer",
+    "marketplace"
+  ],
+  "files": [
+    "dist"
+  ],
+  "author": "GolemFactory <contact@golem.network>",
+  "license": "LGPL-3.0",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "class-validator": "^0.14.0",
+    "commander": "^11.0.0",
+    "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "@types/node": "^20.5.1",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "genversion": "^3.1.1",
+    "jest": "^29.6.3",
+    "prettier": "^3.0.2"
+  }
+}
