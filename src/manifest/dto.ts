@@ -30,8 +30,10 @@ export interface ManifestMetadataPayloadDto {
    * format: <hash-function>:<hash-base64>
    * Example from gap-5: sha3-224:deadbeef01
    * Working example: sha3:84676b9d29cc86ec4862dd8ee991a3f64e9f15bbc00ee3fdfa78105f
+   *
+   * If missing, this payload will be ignored.
    */
-  hash: string;
+  hash?: string;
 }
 
 export interface ManifestCompManifestNetInetOutDto {
