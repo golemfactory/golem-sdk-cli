@@ -3,6 +3,7 @@ import { ManifestDto, ManifestVersions } from "./dto";
 import { writeFile } from "fs/promises";
 import { checkFileOverwrite } from "../lib/file";
 import fetch from 'node-fetch';
+import { DateTime } from "luxon";
 
 const repoUrl = "https://registry.golem.network";
 
@@ -104,11 +105,13 @@ async function getImage(imageSpec: string, providedHash?: string): Promise<Image
 
 export async function manifestCreateAction(name: string, image: string, options: ManifestCreateOptions): Promise<void> {
   const imageData = await getImage(image, options.imageHash);
-  const now = new Date();
+  const now = DateTime.now();
+  const expires = now.plus({ days: 90 }); // TODO: move that to options?
+
   const manifest: ManifestDto = {
     version: ManifestVersions.GAP_5,
-    createdAt: now.toUTCString(),
-    expiresAt: new Date(now.getTime() + 90*24*60*1000).toUTCString(),
+    createdAt: now.toISO() as string,
+    expiresAt: expires.toISO() as string,
     metadata: {
       name,
       description: options.description,
@@ -124,9 +127,6 @@ export async function manifestCreateAction(name: string, image: string, options:
         urls: [ imageData.url ]
       }
     ],
-    compManifest: {
-
-    }
   }
 
   // TODO: Add enquirer to ask for missing fields.
@@ -141,5 +141,4 @@ export async function manifestCreateAction(name: string, image: string, options:
   if (!imageData.hash) {
     console.log('Warning: Image hash is not specified. You won\'t be able to start an activity before you fill it out.');
   }
-
 }

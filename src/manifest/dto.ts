@@ -92,6 +92,6 @@ export interface ManifestDto {
    * - hash is present
    */
   payload: ManifestMetadataPayloadDto[];
-  compManifest:ManifestCompManifestDto;
+  compManifest?: ManifestCompManifestDto;
 
 }
