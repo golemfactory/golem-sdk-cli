@@ -1,10 +1,11 @@
 import { Command } from "commander";
 import { ManifestCreateOptions } from "./manifest-create.options";
+import { createManifestOption } from "./common";
 
 export const manifestCreateCommand = new Command("create");
 manifestCreateCommand
   .description("Create a new Golem manifest.")
-  .option("-f, --manifest <path>", "Path to manifest file.", "./manifest.json")
+  .addOption(createManifestOption())
   .option("-w, --overwrite", "Overwrite existing manifest (if present).")
   .option("-d, --description <text>", "Description of the manifest.")
   .option("-v, --version <version>", "Version of the manifest.", "1.0.0")
