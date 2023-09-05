@@ -26,7 +26,6 @@ export async function manifestVerifyAction(options: ManifestVerifyOptions) {
 
   const verify = createVerify('RSA-SHA256');
   verify.update(manifestBase64);
-  verify.update('\n'); // FIXME: Remove this, this is only for testing.
 
   if (!verify.verify(cert.publicKey, signature)) {
     console.error('Manifest doesn\'t match signature.');

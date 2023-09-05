@@ -16,7 +16,10 @@ async function resolveTaskPackageUrl(tag: string): Promise<ImageInfo> {
   const url = `${repoUrl}/v1/image/info?&tag=${tag}`;
 
   const response = await fetch(url);
-  if (response.status != 200) {
+  if (response.status === 404) {
+    // TODO: Print url on debug and stop using exceptions.
+    throw new Error(`Error: Image ${tag} not found.`)
+  } else if (response.status != 200) {
     throw Error(`Failed to fetch image information: ${response.status} ${response.statusText}`);
   }
 
