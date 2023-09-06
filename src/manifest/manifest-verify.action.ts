@@ -12,8 +12,8 @@ export async function manifestVerifyAction(options: ManifestVerifyOptions) {
   // Read manifest buffer.
   const manifestBuffer = await readFile(options.manifest);
   const manifestBase64 = manifestBuffer.toString('base64');
-  const certFile = Buffer.from(await readFile(options.certificate, 'ascii'), 'base64');
-  const signature = Buffer.from(await readFile(options.signature, 'ascii'), 'base64');
+  const certFile = Buffer.from(await readFile(options.certificateFile, 'ascii'), 'base64');
+  const signature = Buffer.from(await readFile(options.signatureFile, 'ascii'), 'base64');
   // const signature = await readFile(options.signature, 'ascii');
 
   // FIXME: Find better way to get the second (or last?) certificate.
@@ -26,7 +26,6 @@ export async function manifestVerifyAction(options: ManifestVerifyOptions) {
 
   const verify = createVerify('RSA-SHA256');
   verify.update(manifestBase64);
-  verify.update('\n'); // FIXME: Remove this, this is only for testing.
 
   if (!verify.verify(cert.publicKey, signature)) {
     console.error('Manifest doesn\'t match signature.');

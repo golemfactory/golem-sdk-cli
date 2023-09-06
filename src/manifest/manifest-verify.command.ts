@@ -9,8 +9,8 @@ manifestVerifyCommand
     'Verify manifest file for correctness and verify it\'s signature.'
   )
   .addOption(createManifestOption())
-  .option('-c, --certificate <file>', 'Certificate file.', 'manifest.cert')
-  .option('-s, --signature <file>', 'Signature file (base64 encoded).', 'manifest.sig')
+  .option('-c, --certificate-file <file>', 'Certificate file.', 'manifest.cert')
+  .option('-s, --signature-file <file>', 'Signature file (base64 encoded).', 'manifest.sig')
   .action(async (options: ManifestVerifyOptions) => {
     const action = await import("./manifest-verify.action");
     await action.manifestVerifyAction(options);
