@@ -50,8 +50,8 @@ export interface ManifestCompManifestNetDto {
 }
 
 enum ManifestCompManifestScriptMatch {
-  STRICT = 'strict',
-  REGEX = 'regex',
+  STRICT = "strict",
+  REGEX = "regex",
 }
 
 export interface ManifestCompManifestScriptDto {
@@ -66,7 +66,7 @@ export interface ManifestCompManifestDto {
 }
 
 export enum ManifestVersions {
-  GAP_5 = '0.1.0',
+  GAP_5 = "0.1.0",
 }
 
 export interface ManifestDto {
@@ -93,5 +93,4 @@ export interface ManifestDto {
    */
   payload: ManifestMetadataPayloadDto[];
   compManifest?: ManifestCompManifestDto;
-
 }

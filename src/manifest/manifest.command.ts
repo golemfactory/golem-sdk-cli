@@ -6,11 +6,8 @@ import { manifestSignCommand } from "./manifest-sign.command";
 
 export const manifestCommand = new Command("manifest");
 manifestCommand
-  .description('Manage Golem manifest.')
+  .description("Manage Golem manifest.")
   .addCommand(manifestCreateCommand)
   .addCommand(manifestNetCommand)
   .addCommand(manifestSignCommand)
-  .addCommand(manifestVerifyCommand)
-;
-
-
+  .addCommand(manifestVerifyCommand);
