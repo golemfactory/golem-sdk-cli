@@ -1,15 +1,10 @@
-Golem SDK CLI
-=============
+# Golem SDK CLI
 
-
-About
------
+## About
 
 Golem SDK CLI is a command line interface supporting development of applications using [Golem JS](https://github.com/golemfactory/golem-js)
 
-
-Installation
-------------
+## Installation
 
 @golem-sdk/cli is available as a NPM package.
 
@@ -25,11 +20,8 @@ or by yarn:
 yarn add @golem-js/cli
 ```
 
-
-Usage
------
+## Usage
 
 ```bash
 golem-sdk --help
 ```
-
