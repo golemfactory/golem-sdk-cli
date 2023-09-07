@@ -6,7 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx genversion src/lib/version.ts --es6 && tsc",
-    "watch": "npx genversion src/lib/version.ts --es6 && tsc --watch"
+    "watch": "npx genversion src/lib/version.ts --es6 && tsc --watch",
+    "lint": "npm run lint:ts && npm run lint:eslint",
+    "lint:ts": "tsc --project tsconfig.json --noEmit",
+    "lint:eslint": "eslint .",
+    "format": "prettier -w .",
+    "format:check": "prettier -c ."
   },
   "bin": "./src/main.ts",
   "keywords": [

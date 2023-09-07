@@ -2,7 +2,7 @@ import { ManifestCreateOptions } from "./manifest-create.options";
 import { ManifestDto, ManifestVersions } from "./dto";
 import { writeFile } from "fs/promises";
 import { checkFileOverwrite } from "../lib/file";
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 import { DateTime } from "luxon";
 
 const repoUrl = "https://registry.golem.network";
@@ -10,7 +10,7 @@ const repoUrl = "https://registry.golem.network";
 type ImageInfo = {
   url: string;
   hash?: string;
-}
+};
 
 async function resolveTaskPackageUrl(tag: string): Promise<ImageInfo> {
   const url = `${repoUrl}/v1/image/info?&tag=${tag}`;
@@ -18,17 +18,17 @@ async function resolveTaskPackageUrl(tag: string): Promise<ImageInfo> {
   const response = await fetch(url);
   if (response.status === 404) {
     // TODO: Print url on debug and stop using exceptions.
-    throw new Error(`Error: Image ${tag} not found.`)
+    throw new Error(`Error: Image ${tag} not found.`);
   } else if (response.status != 200) {
     throw Error(`Failed to fetch image information: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json() as any;
+  const data = (await response.json()) as { https: string; http: string; sha3: string };
 
   return {
     url: data.https,
-    hash: `sha3:${data.sha3}`
-  }
+    hash: `sha3:${data.sha3}`,
+  };
 }
 
 async function getImageUrlFromTag(tag: string, providedHash?: string): Promise<ImageInfo> {
@@ -36,7 +36,7 @@ async function getImageUrlFromTag(tag: string, providedHash?: string): Promise<I
     return {
       url: `${repoUrl}/v1/image/download?tag=${tag}&https=true`,
       hash: providedHash,
-    }
+    };
   }
 
   return await resolveTaskPackageUrl(tag);
@@ -49,12 +49,12 @@ async function getImageUrlFromUrl(url: string): Promise<ImageInfo> {
     // Warning about missing hash will be displayed in manifestCreateAction.
     return {
       url,
-      hash: undefined
+      hash: undefined,
     };
   }
 
   const urlObject = new URL(url);
-  const hash = urlObject.searchParams.get('hash');
+  const hash = urlObject.searchParams.get("hash");
   // const tag = urlObject.searchParams.get('tag');
 
   if (hash) {
@@ -74,7 +74,7 @@ async function getImageUrlFromUrl(url: string): Promise<ImageInfo> {
   return {
     url,
     hash: undefined,
-  }
+  };
 }
 
 function getImageUrlFromHash(hash: string): ImageInfo {
@@ -105,7 +105,6 @@ async function getImage(imageSpec: string, providedHash?: string): Promise<Image
   }
 }
 
-
 export async function manifestCreateAction(name: string, image: string, options: ManifestCreateOptions): Promise<void> {
   const imageData = await getImage(image, options.imageHash);
   const now = DateTime.now();
@@ -124,13 +123,13 @@ export async function manifestCreateAction(name: string, image: string, options:
       {
         platform: {
           os: "linux",
-          arch: "x86_64"
+          arch: "x86_64",
         },
         hash: imageData.hash,
-        urls: [ imageData.url ]
-      }
+        urls: [imageData.url],
+      },
     ],
-  }
+  };
 
   // TODO: Add enquirer to ask for missing fields.
 
@@ -138,10 +137,10 @@ export async function manifestCreateAction(name: string, image: string, options:
   manifest.metadata.description = options.description;
   manifest.metadata.version = options.version;
 
-  await checkFileOverwrite('Manifest', options.manifest, options.overwrite);
+  await checkFileOverwrite("Manifest", options.manifest, options.overwrite);
   await writeFile(options.manifest, JSON.stringify(manifest, null, 2));
 
   if (!imageData.hash) {
-    console.log('Warning: Image hash is not specified. You won\'t be able to start an activity before you fill it out.');
+    console.log("Warning: Image hash is not specified. You won't be able to start an activity before you fill it out.");
   }
 }

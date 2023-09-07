@@ -13,7 +13,7 @@ function parseUrls(urls: string[]): URL[] {
   const parsed: URL[] = [];
   const errors: string[] = [];
 
-  urls.forEach(url => {
+  urls.forEach((url) => {
     try {
       parsed.push(new URL(url));
     } catch (e) {
@@ -22,31 +22,34 @@ function parseUrls(urls: string[]): URL[] {
   });
 
   if (errors.length) {
-    console.error('Invalid URLs:');
-    console.error(errors.map(url => `- ${url}`).join('\n'));
-    throw new Error('Invalid URL(s) provided.');
+    console.error("Invalid URLs:");
+    console.error(errors.map((url) => `- ${url}`).join("\n"));
+    throw new Error("Invalid URL(s) provided.");
   }
 
   return parsed;
 }
 
-export async function manifestNetAddOutboundAction(urls: string[], options: ManifestNetAddOutboundOptions): Promise<void> {
+export async function manifestNetAddOutboundAction(
+  urls: string[],
+  options: ManifestNetAddOutboundOptions,
+): Promise<void> {
   const parsedUrls = parseUrls(urls);
-  const protocols = parsedUrls.map(url => url.protocol.replace(/:$/, ''));
+  const protocols = parsedUrls.map((url) => url.protocol.replace(/:$/, ""));
 
   let manifest = await readManifest(options.manifest);
   const out = manifest?.compManifest?.net?.inet?.out;
 
   const comp: ManifestCompManifestDto = {
-    version: '0.1.0',
+    version: "0.1.0",
     net: {
       inet: {
         out: {
           urls: combineUniqueArrays(out?.urls ?? [], urls),
           protocols: combineUniqueArrays(out?.protocols ?? [], protocols),
-        }
-      }
-    }
+        },
+      },
+    },
   };
 
   manifest = merge(manifest, { compManifest: comp });

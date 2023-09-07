@@ -3,7 +3,7 @@ import { Stats } from "fs";
 import { readFile, stat } from "fs/promises";
 import schema from "./computation-payload-manifest.schema.json";
 import Ajv from "ajv";
-import addFormats from "ajv-formats"
+import addFormats from "ajv-formats";
 
 export async function readManifest(filename: string): Promise<ManifestDto> {
   let fileStats: Stats;
@@ -42,9 +42,11 @@ export async function readManifest(filename: string): Promise<ManifestDto> {
 
   console.error(`Manifest ${filename} is invalid:`);
   console.error(
-    ajv.errorsText(validate.errors, { separator: "\n" })
-      .split(/\n/g).map(line => `- ${line}`)
-      .join('\n')
+    ajv
+      .errorsText(validate.errors, { separator: "\n" })
+      .split(/\n/g)
+      .map((line) => `- ${line}`)
+      .join("\n"),
   );
   throw new Error(`Error: Manifest ${filename} is not valid.`);
 }

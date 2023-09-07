@@ -2,12 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Computation Payload Manifest",
   "type": "object",
-  "required": [
-    "createdAt",
-    "expiresAt",
-    "payload",
-    "version"
-  ],
+  "required": ["createdAt", "expiresAt", "payload", "version"],
   "properties": {
     "version": {
       "description": "Semver",
@@ -52,19 +47,13 @@
     "AppMetadata": {
       "title": "Application Metadata",
       "type": "object",
-      "required": [
-        "name",
-        "version"
-      ],
+      "required": ["name", "version"],
       "properties": {
         "name": {
           "type": "string"
         },
         "description": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "version": {
           "type": "string"
@@ -76,20 +65,14 @@
           }
         },
         "homepage": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       }
     },
     "AppPayload": {
       "title": "Payload",
       "type": "object",
-      "required": [
-        "hash",
-        "urls"
-      ],
+      "required": ["hash", "urls"],
       "properties": {
         "platform": {
           "anyOf": [
@@ -116,10 +99,7 @@
     "PayloadPlatform": {
       "title": "Payload Platform",
       "type": "object",
-      "required": [
-        "arch",
-        "os"
-      ],
+      "required": ["arch", "os"],
       "properties": {
         "arch": {
           "type": "string"
@@ -128,10 +108,7 @@
           "type": "string"
         },
         "osVersion": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       }
     },
@@ -139,9 +116,7 @@
       "title": "Computation Manifest",
       "description": "Computation Manifests lets Requestors to define a certain set of allowed actions, to be negotiated with and approved by a Provider. Requestors' actions will be verified against the Manifest during computation.",
       "type": "object",
-      "required": [
-        "version"
-      ],
+      "required": ["version"],
       "properties": {
         "version": {
           "title": "Version",
@@ -178,9 +153,7 @@
       "title": "Script",
       "description": "Defines a set of allowed ExeScript commands and applies constraints to their arguments.",
       "type": "object",
-      "required": [
-        "commands"
-      ],
+      "required": ["commands"],
       "properties": {
         "commands": {
           "description": "Specifies a curated list of commands.",
@@ -215,10 +188,7 @@
     "ArgMatch": {
       "title": "Argument Match",
       "type": "string",
-      "enum": [
-        "strict",
-        "regex"
-      ]
+      "enum": ["strict", "regex"]
     },
     "Net": {
       "title": "Net",
@@ -262,12 +232,7 @@
       "properties": {
         "protocols": {
           "description": "List of allowed outbound protocols. Supports \"http\", \"https\", \"ws\", and \"wss\".",
-          "default": [
-            "http",
-            "https",
-            "ws",
-            "wss"
-          ],
+          "default": ["http", "https", "ws", "wss"],
           "type": "array",
           "items": {
             "type": "string"
@@ -275,10 +240,7 @@
         },
         "urls": {
           "description": "List of allowed external URLs that outbound requests can be sent to. E.g. [\"http://golemfactory.s3.amazonaws.com/file1\", \"http://golemfactory.s3.amazonaws.com/file2\"]",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string",
             "format": "uri"
