@@ -18,7 +18,13 @@ export async function manifestVerifyAction(options: ManifestVerifyOptions) {
 
   // FIXME: Find better way to get the second (or last?) certificate.
   const certInput = certFile.toString();
-  const i = certInput.indexOf("-----BEGIN CERTIFICATE-----", 2);
+  const i = certInput.lastIndexOf("-----BEGIN CERTIFICATE-----");
+
+  if (i === -1) {
+    console.error("Could not locate the certificate to use for validation. Certificate file contents:", certFile.toString());
+    process.exit(1);
+  }
+
   const certSecond = certInput.substring(i);
 
   // const cert = new X509Certificate(certFile);
@@ -33,12 +39,5 @@ export async function manifestVerifyAction(options: ManifestVerifyOptions) {
   }
 
   // TODO: Check if the certificate is not expired.
-
   console.log("Manifest matches signature.");
-  /*
-  console.log('Certificate:', cert.publicKey.export({
-    format: 'pem',
-    type: 'pkcs1',
-  }));
-*/
 }

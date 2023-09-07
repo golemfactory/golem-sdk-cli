@@ -143,4 +143,6 @@ export async function manifestCreateAction(name: string, image: string, options:
   if (!imageData.hash) {
     console.log("Warning: Image hash is not specified. You won't be able to start an activity before you fill it out.");
   }
+
+  console.log("Created manifest in %s file", options.manifest);
 }

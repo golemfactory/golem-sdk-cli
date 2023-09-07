@@ -24,4 +24,6 @@ export async function manifestSignAction(options: ManifestSignOptions): Promise<
 
   // write signature to options.signatureFile.
   await writeFile(options.signatureFile, Buffer.from(signature).toString("base64"), "ascii");
+
+  console.log("Signed the manifest file and stored the signature in %s", options.signatureFile);
 }
