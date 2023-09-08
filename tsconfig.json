@@ -18,6 +18,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "moduleResolution": "node16"
   }
 }

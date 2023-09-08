@@ -10,6 +10,6 @@ manifestSignCommand
   .option("-p, --passphrase <passphrase>", "Passphrase for the private key.")
   .option("-s, --signature-file <file>", "Signature file.", "manifest.sig")
   .action(async (options: ManifestSignOptions) => {
-    const action = await import("./manifest-sign.action");
-    await action.manifestSignAction(options);
+    const action = await import("./manifest-sign.action.js");
+    await action.default.manifestSignAction(options);
   });
