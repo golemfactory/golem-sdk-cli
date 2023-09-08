@@ -1,15 +1,14 @@
 {
   "name": "@golem-sdk/cli",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "CLI for Golem SDK",
-  "main": "dist/main.js",
   "repository": {
     "type": "github",
     "url": "github:GolemFactory/golem-sdk-cli"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc --build",
     "watch": "tsc --watch",
     "lint": "npm run lint:ts && npm run lint:eslint",
     "lint:ts": "tsc --project tsconfig.json --noEmit",
