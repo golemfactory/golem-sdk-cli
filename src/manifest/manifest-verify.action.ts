@@ -21,7 +21,10 @@ export async function manifestVerifyAction(options: ManifestVerifyOptions) {
   const i = certInput.lastIndexOf("-----BEGIN CERTIFICATE-----");
 
   if (i === -1) {
-    console.error("Could not locate the certificate to use for validation. Certificate file contents:", certFile.toString());
+    console.error(
+      "Could not locate the certificate to use for validation. Certificate file contents:",
+      certFile.toString(),
+    );
     process.exit(1);
   }
 
