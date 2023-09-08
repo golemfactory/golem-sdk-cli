@@ -10,6 +10,6 @@ manifestVerifyCommand
   .option("-c, --certificate-file <file>", "Certificate file.", "manifest.cert")
   .option("-s, --signature-file <file>", "Signature file (base64 encoded).", "manifest.sig")
   .action(async (options: ManifestVerifyOptions) => {
-    const action = await import("./manifest-verify.action");
+    const action = await import("./manifest-verify.action.js");
     await action.manifestVerifyAction(options);
   });

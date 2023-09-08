@@ -14,6 +14,6 @@ manifestNetAddOutboundCommand
   .addOption(createManifestOption())
   .argument("<url...>", "URLs to be added to the manifest.")
   .action(async (urls: string[], options: ManifestNetAddOutboundOptions) => {
-    const action = await import("./manifest-net-add-outbound.action");
+    const action = await import("./manifest-net-add-outbound.action.js");
     await action.manifestNetAddOutboundAction(urls, options);
   });
