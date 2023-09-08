@@ -38,3 +38,5 @@ jobs:
           npm run format:check
           npm run lint
           npm run build
+          npm ln
+          golem-sdk --version
