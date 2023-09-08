@@ -19,6 +19,6 @@
     "outDir": "dist",
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "node16"
   }
 }
