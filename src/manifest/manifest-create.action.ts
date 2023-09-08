@@ -1,9 +1,10 @@
 import { ManifestCreateOptions } from "./manifest-create.options";
 import { ManifestDto, ManifestVersions } from "./dto";
-import { writeFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import { checkFileOverwrite } from "../lib/file";
 import fetch from "node-fetch";
 import { DateTime } from "luxon";
+import { findAsync } from "new-find-package-json";
 
 const repoUrl = "https://registry.golem.network";
 
@@ -105,19 +106,79 @@ async function getImage(imageSpec: string, providedHash?: string): Promise<Image
   }
 }
 
-export async function manifestCreateAction(name: string, image: string, options: ManifestCreateOptions): Promise<void> {
+async function findPackageJson(possiblePath?: string): Promise<string | undefined> {
+  if (possiblePath) {
+    return possiblePath;
+  }
+
+  // Find first package.json file.
+  for await (const path of findAsync(process.cwd(), "package.json")) {
+    return path;
+  }
+}
+
+async function fillOptionsWithPackageJson(options: ManifestCreateOptions): Promise<ManifestCreateOptions> {
+  if ("manifestVersion" in options && "name" in options && "description" in options) {
+    // All fields from package.json are provided.
+    return options;
+  }
+
+  const path = await findPackageJson(options.packageJson);
+  if (!path) {
+    console.error(
+      'Error: Cannot find package.json. Use "--package-json" option to specify its path or make sure --name, --description and --manifest-version are set.',
+    );
+    process.exit(1);
+  }
+
+  // Read package.json.
+  let packageData: string;
+  try {
+    packageData = await readFile(path, "utf-8");
+  } catch (e) {
+    console.error(`Error: Cannot read ${path}: ${e}`);
+    process.exit(1);
+  }
+
+  // Parse package.json
+  let packageJson: { version: string; name: string; description?: string };
+  try {
+    packageJson = JSON.parse(packageData);
+  } catch (e) {
+    console.error(`Error: Cannot parse ${path}: ${e}`);
+    process.exit(1);
+  }
+
+  if (!("manifestVersion" in options)) {
+    options.manifestVersion = packageJson.version;
+  }
+
+  if (!("name" in options)) {
+    options.name = packageJson.name;
+  }
+
+  if (!("description" in options)) {
+    options.description = packageJson.description;
+  }
+
+  return options;
+}
+
+export async function manifestCreateAction(image: string, options: ManifestCreateOptions): Promise<void> {
   const imageData = await getImage(image, options.imageHash);
   const now = DateTime.now();
   const expires = now.plus({ days: 90 }); // TODO: move that to options?
+
+  options = await fillOptionsWithPackageJson(options);
 
   const manifest: ManifestDto = {
     version: ManifestVersions.GAP_5,
     createdAt: now.toISO() as string,
     expiresAt: expires.toISO() as string,
     metadata: {
-      name,
+      name: options.name!,
       description: options.description,
-      version: options.version,
+      version: options.manifestVersion!,
     },
     payload: [
       {
@@ -132,11 +193,6 @@ export async function manifestCreateAction(name: string, image: string, options:
   };
 
   // TODO: Add enquirer to ask for missing fields.
-
-  manifest.metadata.name = name;
-  manifest.metadata.description = options.description;
-  manifest.metadata.version = options.version;
-
   await checkFileOverwrite("Manifest", options.manifest, options.overwrite);
   await writeFile(options.manifest, JSON.stringify(manifest, null, 2));
 

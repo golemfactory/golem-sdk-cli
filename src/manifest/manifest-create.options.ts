@@ -1,7 +1,9 @@
 export interface ManifestCreateOptions {
-  version: string;
+  manifestVersion?: string;
   overwrite: boolean;
-  description: string;
+  name?: string;
+  description?: string;
   manifest: string;
-  imageHash: string;
+  imageHash?: string;
+  packageJson?: string;
 }
