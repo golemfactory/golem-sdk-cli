@@ -4,10 +4,14 @@ import { ManifestVerifyOptions } from "./manifest-verify.options";
 import { X509Certificate } from "node:crypto";
 import { readFile } from "fs/promises";
 import { createVerify } from "crypto";
+import { assertFileExists } from "../lib/file";
 
 export async function manifestVerifyAction(options: ManifestVerifyOptions) {
   // Read and validate the manifest.
   await readManifest(options.manifest);
+
+  await assertFileExists("Certificate file", options.certificateFile, "Check --certificate-file option.");
+  await assertFileExists("Signature file", options.signatureFile, "Check --signature-file option.");
 
   // Read manifest buffer.
   const manifestBuffer = await readFile(options.manifest);
