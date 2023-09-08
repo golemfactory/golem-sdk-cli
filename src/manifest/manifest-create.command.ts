@@ -14,5 +14,5 @@ manifestCreateCommand
   .argument("<image>", "Image to be used in the manifest, identified by URL, image tag or image hash.")
   .action(async (name: string, image: string, options: ManifestCreateOptions) => {
     const action = await import("./manifest-create.action.js");
-    await action.manifestCreateAction(name, image, options);
+    await action.default.manifestCreateAction(name, image, options);
   });

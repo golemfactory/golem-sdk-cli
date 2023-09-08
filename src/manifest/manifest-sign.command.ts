@@ -11,5 +11,5 @@ manifestSignCommand
   .option("-s, --signature-file <file>", "Signature file.", "manifest.sig")
   .action(async (options: ManifestSignOptions) => {
     const action = await import("./manifest-sign.action.js");
-    await action.manifestSignAction(options);
+    await action.default.manifestSignAction(options);
   });
