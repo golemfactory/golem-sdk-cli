@@ -21,3 +21,13 @@ export async function checkFileOverwrite(
     // File does not exist, that's fine.
   }
 }
+
+export async function assertFileExists(name: string, path: string): Promise<void> {
+  try {
+    await stat(path);
+  } catch (e) {
+    // File does not exist, that's fine.
+    console.error(`Error: ${name} "${path}" not found.`);
+    process.exit(1);
+  }
+}
