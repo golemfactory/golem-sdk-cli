@@ -14,15 +14,39 @@ export async function manifestSignAction(options: ManifestSignOptions): Promise<
   const manifestBase64 = manifestBuffer.toString("base64");
 
   const keyFile = await readFile(options.keyFile);
+  let passphraseRequired = keyFile.toString("ascii").includes("BEGIN ENCRYPTED PRIVATE KEY");
 
-  // Parse key file to KeyObject?
+  if (passphraseRequired && !options.passphrase) {
+    console.error("Error: Private key file is encrypted and no passphrase was provided. Use --passphrase option.");
+    process.exit(1);
+  } else if (!passphraseRequired && options.passphrase) {
+    console.error("Error: Private key file is not encrypted and passphrase was provided. Remove --passphrase option.");
+    process.exit(1);
+  }
+
+  // Sign the manifest.
+  let signature: Buffer;
   const sign = createSign("RSA-SHA256");
   sign.update(manifestBase64);
-  const signature = sign.sign({
-    key: keyFile,
-    // FIXME: Allow secure passphrase input and detect if a passphrase is needed.
-    passphrase: options.passphrase,
-  });
+
+  try {
+    signature = sign.sign({
+      key: keyFile,
+      passphrase: options.passphrase,
+    });
+  } catch (e) {
+    if (e instanceof Error && "code" in e) {
+      if (e.code === "ERR_OSSL_BAD_DECRYPT") {
+        console.error(`Error: Wrong passphrase provided for the private key ${options.keyFile}.`);
+        process.exit(1);
+      } else if (e.code === "ERR_OSSL_UNSUPPORTED") {
+        console.error(`Error: Private key file ${options.keyFile} is not supported.`);
+        process.exit(1);
+      }
+    }
+
+    throw e;
+  }
 
   // write signature to options.signatureFile.
   await writeFile(options.signatureFile, Buffer.from(signature).toString("base64"), "ascii");
