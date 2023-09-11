@@ -14,7 +14,7 @@ export async function manifestSignAction(options: ManifestSignOptions): Promise<
   const manifestBase64 = manifestBuffer.toString("base64");
 
   const keyFile = await readFile(options.keyFile);
-  let passphraseRequired = keyFile.toString("ascii").includes("BEGIN ENCRYPTED PRIVATE KEY");
+  const passphraseRequired = keyFile.toString("ascii").includes("BEGIN ENCRYPTED PRIVATE KEY");
 
   if (passphraseRequired && !options.passphrase) {
     console.error("Error: Private key file is encrypted and no passphrase was provided. Use --passphrase option.");
