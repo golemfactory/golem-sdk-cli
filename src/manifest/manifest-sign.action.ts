@@ -5,9 +5,11 @@ import { createSign } from "crypto";
 import { assertFileExists } from "../lib/file";
 
 export async function manifestSignAction(options: ManifestSignOptions): Promise<void> {
-  // Read and validate the manifest.
-  await readManifest(options.manifest);
+  await assertFileExists("Manifest file", options.manifest, "Check --manifest option.");
   await assertFileExists("Private key file", options.keyFile, "Check --key-file option.");
+
+  // Validate the manifest. We don't need parsed data, so output is ignored.
+  await readManifest(options.manifest);
 
   // Read manifest buffer.
   const manifestBuffer = await readFile(options.manifest);

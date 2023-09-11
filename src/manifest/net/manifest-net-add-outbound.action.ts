@@ -4,6 +4,7 @@ import { ManifestCompManifestDto } from "../dto";
 import { merge } from "lodash";
 import { writeFile } from "fs/promises";
 import { combineUniqueArrays } from "../../lib/data";
+import { assertFileExists } from "../../lib/file";
 
 /**
  * Parse provided urls and report error if any of them are invalid.
@@ -34,6 +35,8 @@ export async function manifestNetAddOutboundAction(
   urls: string[],
   options: ManifestNetAddOutboundOptions,
 ): Promise<void> {
+  await assertFileExists("Manifest file", options.manifest, "Check --manifest option.");
+
   const parsedUrls = parseUrls(urls);
   const protocols = parsedUrls.map((url) => url.protocol.replace(/:$/, ""));
 

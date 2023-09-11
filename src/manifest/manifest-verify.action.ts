@@ -6,45 +6,42 @@ import { readFile } from "fs/promises";
 import { createVerify } from "crypto";
 import { assertFileExists } from "../lib/file";
 
-export async function manifestVerifyAction(options: ManifestVerifyOptions) {
-  // Read and validate the manifest.
-  await readManifest(options.manifest);
+function getLastCertificate(certificateChain: string, certFile: string): string {
+  const i = certificateChain.lastIndexOf("-----BEGIN CERTIFICATE-----");
 
+  if (i === -1) {
+    console.error(`Error: Could not locate the certificate to use for validation in ${certFile}.`);
+    process.exit(1);
+  }
+
+  return certificateChain.substring(i);
+}
+
+export async function manifestVerifyAction(options: ManifestVerifyOptions) {
+  await assertFileExists("Manifest file", options.manifest, "Check --manifest option.");
   await assertFileExists("Certificate file", options.certificateFile, "Check --certificate-file option.");
   await assertFileExists("Signature file", options.signatureFile, "Check --signature-file option.");
+
+  // Validate the manifest. We don't need parsed data, so output is ignored.
+  await readManifest(options.manifest);
 
   // Read manifest buffer.
   const manifestBuffer = await readFile(options.manifest);
   const manifestBase64 = manifestBuffer.toString("base64");
-  const certFile = Buffer.from(await readFile(options.certificateFile, "ascii"), "base64");
+  const certFile = await readFile(options.certificateFile, "ascii");
   const signature = Buffer.from(await readFile(options.signatureFile, "ascii"), "base64");
-  // const signature = await readFile(options.signature, 'ascii');
 
-  // FIXME: Find better way to get the second (or last?) certificate.
-  const certInput = certFile.toString();
-  const i = certInput.lastIndexOf("-----BEGIN CERTIFICATE-----");
-
-  if (i === -1) {
-    console.error(
-      "Could not locate the certificate to use for validation. Certificate file contents:",
-      certFile.toString(),
-    );
-    process.exit(1);
-  }
-
-  const certSecond = certInput.substring(i);
-
-  // const cert = new X509Certificate(certFile);
-  const cert = new X509Certificate(Buffer.from(certSecond));
+  const certLast = getLastCertificate(certFile, options.certificateFile);
+  const cert = new X509Certificate(Buffer.from(certLast));
 
   const verify = createVerify("RSA-SHA256");
   verify.update(manifestBase64);
 
   if (!verify.verify(cert.publicKey, signature)) {
-    console.error("Manifest doesn't match signature.");
+    console.error("Error: Manifest doesn't match signature.");
     process.exit(1);
   }
 
-  // TODO: Check if the certificate is not expired.
+  // TODO: Check if the certificate and manifest are not expired.
   console.log("Manifest matches signature.");
 }
