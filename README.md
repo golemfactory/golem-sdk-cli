@@ -61,7 +61,7 @@ If you see a feature missing, or a possible quality-of-life improvement we could
 
 ### Golem Manifest
 
-Golem Manifest is a JSON document that describes your Golem application. While it is not required for simple applications,
+[Golem Manifest](https://docs.golem.network/docs/golem/payload-manifest) is a JSON document that describes your Golem application. While it is not required for simple applications,
 you will need it if you want to access advanced features of the Golem SDK.
 
 Whenever the `golem-sdk` CLI needs to access the manifest file, by default it will look for `manifest.json`. If you want to use a different file, you can do that by using the `--manifest` (or `-m`) option.
@@ -76,7 +76,7 @@ golem-sdk manifest create <image>
 
 If you have a `package.json` file in your project, it will be used to fill in the `name`, `version`, and `description` fields of the manifest. Otherwise, you will need to provide them manually.
 
-The provided `image` argument should identify the GVMI image that will be used by your application.
+The provided `image` argument should identify the GVMI image that will be used by your application. You cacn learn more about Golem images [here](https://docs.golem.network/docs/creators/javascript/guides/golem-images).
 
 #### Image
 
@@ -178,7 +178,7 @@ The Pull Request should describe what changes you've made, what's the purpose of
   - [QuickStart](https://docs.golem.network/docs/creators/javascript/quickstarts) for JavaScript developers
   - Have a look at the most important concepts behind any Golem
     application: [Golem application fundamentals](https://handbook.golem.network/requestor-tutorials/golem-application-fundamentals)
-  - Learn about preparing your own Docker-like [images]([https://handbook.golem.network/requestor-tutorials/vm-runtime](https://docs.golem.network/docs/creators/javascript/guides/golem-images)).
+  - Learn about preparing your custom Docker-like [images](https://docs.golem.network/docs/creators/javascript/tutorials/building-custom-image).
 - Related projects:
   - [Golem SDK](https://github.com/golemfactory/golem-js) - Typescript + NodeJS API for Golem.
   - [Yagna](https://github.com/golemfactory/yagna) - An open platform and marketplace for distributed computations.
