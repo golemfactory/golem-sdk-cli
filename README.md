@@ -4,7 +4,7 @@ Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfa
 
 ## Installing / Getting started
 
-Golem SDK CLI is available as a NPM package.
+Golem SDK CLI is available as an NPM package.
 
 Install using npm:
 
@@ -24,7 +24,7 @@ To check if the installation was successful, run:
 golem-sdk --version
 ```
 
-After installation the CLI is ready to be used.
+After installation, the CLI is ready to be used.
 
 ## Developing
 
@@ -55,16 +55,16 @@ Now `golem-sdk` command should be available in your system.
 ## Features
 
 Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). As such, it is being
-developed in parallel with the SDK and new features will be added as the SDK evolves or new use-cases are identified.
+developed in parallel with the SDK and new features will be added as the SDK evolves or new use cases are identified.
 
-If you see a feature missing, or a possible quality of life improvement we could implement, please open an issue or a pull request.
+If you see a feature missing, or a possible quality-of-life improvement we could implement, please open an issue or a pull request.
 
 ### Golem Manifest
 
 Golem Manifest is a JSON document that describes your Golem application. While it is not required for simple applications,
 you will need it if you want to access advanced features of the Golem SDK.
 
-Whenever `golem-sdk` CLI needs to access the manifest file, by default it will look for `manifest.json`. If you want to use a different file, you can do that by using `--manifest` (or `-m`) option.
+Whenever the `golem-sdk` CLI needs to access the manifest file, by default it will look for `manifest.json`. If you want to use a different file, you can do that by using the `--manifest` (or `-m`) option.
 
 ### Creating a Golem Manifest
 
@@ -74,15 +74,15 @@ To create a new Golem Manifest with `golem-sdk` CLI, run:
 golem-sdk manifest create <image>
 ```
 
-If you have a `package.json` file in your project, it will be used to fill in the `name`, `version` and `description` fields of the manifest. Otherwise you wiil need to provide them manually.
+If you have a `package.json` file in your project, it will be used to fill in the `name`, `version`, and `description` fields of the manifest. Otherwise, you will need to provide them manually.
 
-Provided `image` argument should identify the GVMI image that will be used by your application.
+The provided `image` argument should identify the GVMI image that will be used by your application.
 
 #### Image
 
-The manifest needs to contain the image URL pointing to GVMI download location and it's hash to validate its integrity.
-In order to facilitate the process of creating a manifest, `golem-sdk` accepts multiple forms of image argument, where some of them will automatically resolve the URL and/or hash.
-Please consult the table bellow for more details:
+The manifest needs to contain the image URL pointing to the GVMI download location and its hash to validate its integrity.
+To facilitate the process of creating a manifest, `golem-sdk` accepts multiple forms of image argument, where some of them will automatically resolve the URL and/or hash.
+Please consult the table below for more details:
 
 | Argument                           | `--image-hash`               | Example                                                                                       | Notes                                                                                             |
 | ---------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
@@ -91,14 +91,14 @@ Please consult the table bellow for more details:
 | URL to registry.golem.network      | automatically resolved       | `https://registry.golem.network/v1/image/download?tag=golem-examples/blender:2.80&https=true` |                                                                                                   |
 | URL to arbitrary download location | hash is needed               | `https://example.com/my-image`                                                                |                                                                                                   |
 
-If hash is not provided or resolved, you will get a warning that the manifest will not be usable until you provide it manually.
+If the hash is not provided or resolved, you will get a warning that the manifest will not be usable until you provide it manually.
 
 ### Adding outbound URLs
 
-In order to be able to access the internet from Golem network, your application needs to declare the outbound URLs it will be using inside its manifest.
+To be able to access the internet from the Golem network, your application needs to declare the outbound URLs it will be using inside its manifest.
 
 There is a default set of URLs that providers may allow your application to use ([default whitelist](https://github.com/golemfactory/ya-installer-resources/tree/main/whitelist)).
-In order to use URLs from outside of this whitelist, you need to provide a signed manifest that can be validated by certificates issued by Golem.
+To use URLs from outside of this whitelist, you need to provide a signed manifest that can be validated by certificates issued by Golem.
 
 **NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on [Discord](https://chat.golem.network) if you need to use URLs outside the default whitelist.
 
@@ -122,7 +122,7 @@ golem-sdk manifest net add-outbound https://golem.network https://github.com htt
 
 ### Signing the manifest
 
-In order to use URLs outside the default whitelist, you need to sign the manifest with a key provided by Golem.
+To use URLs outside the default whitelist, you need to sign the manifest with a key provided by Golem.
 
 **NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on [Discord](https://chat.golem.network) if you need to use URLs outside the default whitelist.
 
@@ -138,13 +138,13 @@ This command will produce a signature file (by default `manifest.sig`) that you 
 
 ### Verifying the signature
 
-You can verify manifest signature with your certificate using the following command:
+You can verify the manifest signature with your certificate using the following command:
 
 ```shell
 golem-sdk manifest verify
 ```
 
-By default, it will use `manifest.pem` as the certificate file and `manifest.sig` as the signature file. You can change that by using `--certificate-file` and `--signature-file` options.
+By default, it will use `manifest.pem` as the certificate file and `manifest.sig` as the signature file. You can change that by using the `--certificate-file` and `--signature-file` options.
 
 On success, it will print the following message:
 
@@ -157,9 +157,9 @@ It is important to use this command to make sure the key you are using is compat
 ## Contributing
 
 If you'd like to contribute to the project, you can fork the repository and create a Pull Request.
-Code contribution are warmly welcomed.
+Code contributions are warmly welcomed.
 
-Please make sure the code follows coding style as configured in `.eslintrc` and `.prettierrc`.
+Please make sure the code follows the coding style as configured in `.eslintrc` and `.prettierrc`.
 
 The Pull Request should describe what changes you've made, what's the purpose of them and how to use them.
 
@@ -169,18 +169,16 @@ The Pull Request should describe what changes you've made, what's the purpose of
 - Repository: https://github.com/golemfactory/golem-sdk-cli
 - Issue tracker: https://github.com/golemfactory/golem-sdk-cli/issues
   - In case of sensitive bugs like security vulnerabilities, please contact
-    us directly through our [contact form](https://www.golem.network/contact-form) instead of using issue tracker.
+    us directly through our [contact form](https://www.golem.network/contact-form) instead of using the issue tracker.
     We value your effort to improve the security and privacy of this project!
 - [Golem](https://golem.network), a global, open-source, decentralized supercomputer that anyone can access.
 - [Golem Image Registry](https://registry.golem.network)
 - [Golem Discord](https://chat.golem.network)
 - Documentation:
-  - [Quick start](https://docs.golem.network/docs/creators/javascript/quickstarts) for JavaScript developers
+  - [QuickStart](https://docs.golem.network/docs/creators/javascript/quickstarts) for JavaScript developers
   - Have a look at the most important concepts behind any Golem
     application: [Golem application fundamentals](https://handbook.golem.network/requestor-tutorials/golem-application-fundamentals)
-  - Learn about preparing your own Docker-like images for
-    the [VM runtime](https://handbook.golem.network/requestor-tutorials/vm-runtime)
-  - [Requestor development: a quick primer](https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development)
+  - Learn about preparing your own Docker-like [images]([https://handbook.golem.network/requestor-tutorials/vm-runtime](https://docs.golem.network/docs/creators/javascript/guides/golem-images)).
 - Related projects:
   - [Golem SDK](https://github.com/golemfactory/golem-js) - Typescript + NodeJS API for Golem.
   - [Yagna](https://github.com/golemfactory/yagna) - An open platform and marketplace for distributed computations.
@@ -188,6 +186,6 @@ The Pull Request should describe what changes you've made, what's the purpose of
 
 ## Licensing
 
-The code in this project is licensed under LGPL-3 license.
+The code in this project is licensed under the LGPL-3 license.
 
 See [LICENSE](LICENSE) for more information.
