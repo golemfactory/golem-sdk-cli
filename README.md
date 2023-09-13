@@ -100,10 +100,10 @@ If hash is not provided or resolved, you will get a warning that the manifest wi
 
 In order to be able to access the internet from Golem network, your application needs to declare the outbound URLs it will be using inside its manifest.
 
-There is a default set of URLs that providers may allow your application to use (TODO: link to default URL whitelist).
+There is a default set of URLs that providers may allow your application to use ([default whitelist](https://github.com/golemfactory/ya-installer-resources/tree/main/whitelist)).
 In order to use URLs from outside of this whitelist, you need to provide a signed manifest that can be validated by certificates issued by Golem.
 
-**NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on discord if you need to use URLs outside the default whitelist.
+**NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on [Discord](https://chat.golem.network) if you need to use URLs outside the default whitelist.
 
 You can use this command multiple times to update URLs in the manifest, and you can pass multiple URLs at once.
 
@@ -129,7 +129,7 @@ golem-sdk manifest net add-outbound https://golem.network https://github.com htt
 
 In order to use URLs outside the default whitelist, you need to sign the manifest with a key provided by Golem.
 
-**NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on discord if you need to use URLs outside the default whitelist.
+**NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on [Discord](https://chat.golem.network) if you need to use URLs outside the default whitelist.
 
 If your private key is encrypted, you will need to provide the correct passphrase (`-p` or `--passphrase` option).
 
@@ -176,13 +176,13 @@ The Pull Request should describe what changes you've made, what's the purpose of
 - Repository: https://github.com/golemfactory/golem-sdk-cli
 - Issue tracker: https://github.com/golemfactory/golem-sdk-cli/issues
     - In case of sensitive bugs like security vulnerabilities, please contact
-      my@email.com directly instead of using issue tracker. We value your effort
-      to improve the security and privacy of this project!
+      us directly through our [contact form](https://www.golem.network/contact-form) instead of using issue tracker.
+      We value your effort to improve the security and privacy of this project!
 - [Golem](https://golem.network), a global, open-source, decentralized supercomputer that anyone can access.
 - [Golem Image Registry](https://registry.golem.network)
-- [Golem Discord](https://discord.gg/golem)
+- [Golem Discord](https://chat.golem.network)
 - Documentation:
-    - [Quick start](https://docs.golem.network/creators/javascript/quickstart/) for JavaScript developers
+    - [Quick start](https://docs.golem.network/docs/creators/javascript/quickstarts) for JavaScript developers
     - Have a look at the most important concepts behind any Golem
       application: [Golem application fundamentals](https://handbook.golem.network/requestor-tutorials/golem-application-fundamentals)
     - Learn about preparing your own Docker-like images for
