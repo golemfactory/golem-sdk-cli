@@ -16,16 +16,24 @@ function parseUrls(urls: string[]): URL[] {
 
   urls.forEach((url) => {
     try {
-      parsed.push(new URL(url));
+      const parsedUrl = new URL(url);
+      if (!parsedUrl.protocol) {
+        errors.push(url);
+        return;
+      }
+
+      // TODO: Filter only supported protocols. Problem: we don't know yet what is supported.
+
+      parsed.push(parsedUrl);
     } catch (e) {
       errors.push(url);
     }
   });
 
   if (errors.length) {
-    console.error("Invalid URLs:");
+    console.error("Error: Invalid URLs provided:");
     console.error(errors.map((url) => `- ${url}`).join("\n"));
-    throw new Error("Invalid URL(s) provided.");
+    process.exit(1);
   }
 
   return parsed;
