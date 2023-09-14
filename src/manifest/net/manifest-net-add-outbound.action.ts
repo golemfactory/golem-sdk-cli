@@ -17,13 +17,7 @@ function parseUrls(urls: string[]): URL[] {
   urls.forEach((url) => {
     try {
       const parsedUrl = new URL(url);
-      if (!parsedUrl.protocol) {
-        errors.push(url);
-        return;
-      }
-
       // TODO: Filter only supported protocols. Problem: we don't know yet what is supported.
-
       parsed.push(parsedUrl);
     } catch (e) {
       errors.push(url);

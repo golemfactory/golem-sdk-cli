@@ -12,7 +12,10 @@ manifestCreateCommand
   .option("-v, --manifest-version <version>", "Version of the manifest.")
   .option("-i, --image-hash <hash>", "Image hash to be used in the manifest (format 'hash-function:hash-base64').")
   .option("-p, --package-json <file>", "Package.json file to be used as information source.")
-  .argument("<image>", "Image to be used in the manifest, identified by URL, image tag or image hash.")
+  .argument(
+    "<image>",
+    "Image to be used in the manifest, identified by URL, image tag or image hash. See README.md for details.",
+  )
   .addHelpText(
     "after",
     "\npackage.json can be used to automatically fill manifest name, description and version." +

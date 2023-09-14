@@ -87,9 +87,17 @@ function getImageUrlFromHash(hash: string): ImageInfo {
 
 async function getImage(imageSpec: string, providedHash?: string): Promise<ImageInfo> {
   const tagRegex = /^(.*?)\/(.*?):(.*)$/;
-  const hashRegex = /^(\w+)$/;
+  const hashRegex = /^[a-z0-9]{56}$/;
+  const maybeHash = /^[a-z0-9]+$/;
 
-  if (hashRegex.test(imageSpec)) {
+  if (maybeHash.test(imageSpec)) {
+    if (!hashRegex.test(imageSpec)) {
+      console.error(
+        `Error: Image name ${imageSpec} looks like a hash, but has invalid length. Please make sure it is a valid SHA3 hash.`,
+      );
+      process.exit(1);
+    }
+
     return getImageUrlFromHash(imageSpec);
   } else if (tagRegex.test(imageSpec)) {
     return await getImageUrlFromTag(imageSpec, providedHash);
@@ -164,8 +172,25 @@ async function fillOptionsWithPackageJson(options: ManifestCreateOptions): Promi
   return options;
 }
 
+function validateImageInfo(imageInfo: ImageInfo) {
+  const hashWithFunctionRegEx = /^sha3:[a-z0-9]{56}$/;
+
+  try {
+    new URL(imageInfo.url);
+  } catch (e) {
+    console.error(`Error: Failed to parse xx image URL ${imageInfo.url}: ${e}`);
+    process.exit(1);
+  }
+
+  if (!hashWithFunctionRegEx.test(imageInfo.hash ?? "")) {
+    console.error(`Error: Invalid image hash ${imageInfo.hash}.`);
+    process.exit(1);
+  }
+}
+
 export async function manifestCreateAction(image: string, options: ManifestCreateOptions): Promise<void> {
   const imageData = await getImage(image, options.imageHash);
+  validateImageInfo(imageData);
   const now = DateTime.now();
   const expires = now.plus({ days: 90 }); // TODO: move that to options?
 
