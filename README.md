@@ -1,6 +1,6 @@
 # Golem SDK CLI
 
-Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). It allows you to create and manage Golem JS projects.
+Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). It accelerates the creation and management of Golem JS projects.
 
 ## Installing / Getting started
 
@@ -57,26 +57,25 @@ Now `golem-sdk` command should be available in your system.
 Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). As such, it is being
 developed in parallel with the SDK and new features will be added as the SDK evolves or new use cases are identified.
 
-If you see a feature missing, or a possible quality-of-life improvement we could implement, please open an issue or a pull request.
+If you see a feature missing or a possible JS SDK user experience improvement we could implement, please open an issue or a pull request.
 
 ### Golem Manifest
 
-[Golem Manifest](https://docs.golem.network/docs/golem/payload-manifest) is a JSON document that describes your Golem application. While it is not required for simple applications,
-you will need it if you want to access advanced features of the Golem SDK.
+[Golem Manifest](https://docs.golem.network/docs/golem/payload-manifest) is a JSON document that describes your Golem application. While it is not necessary for simple applications, you will need it if you want to access advanced features of the Golem SDK, like access to the Internet (outbound).
 
-Whenever the `golem-sdk` CLI needs to access the manifest file, by default it will look for `manifest.json`. If you want to use a different file, you can do that by using the `--manifest` (or `-m`) option.
+The `golem-sdk` CLI allows users to create and update the manifest file. By default, it assumes the manifest is available in a `manifest.json` file in the current folder. If you want to point to a different file, use the --manifest (or -m) option.
 
 ### Creating a Golem Manifest
 
 To create a new Golem Manifest with `golem-sdk` CLI, run:
 
 ```shell
-golem-sdk manifest create <image>
+golem-sdk manifest create <image> [--image-hash hash] 
 ```
 
-If you have a `package.json` file in your project, it will be used to fill in the `name`, `version`, and `description` fields of the manifest. Otherwise, you will need to provide them manually.
+The `image` argument should identify the GVMI image used by your application. The tools accept a few formats which are explained in the table below. You can learn more about Golem images [here](https://docs.golem.network/docs/creators/javascript/guides/golem-images).
 
-The provided `image` argument should identify the GVMI image that will be used by your application. You can learn more about Golem images [here](https://docs.golem.network/docs/creators/javascript/guides/golem-images).
+If you have a `package.json` file in your project, the tool will use `name`, `version`, and `description` fields from this file to fill fields in the manifest. Otherwise, you will need to provide them manually.
 
 #### Image
 
@@ -84,33 +83,29 @@ The manifest needs to contain the image URL pointing to the GVMI download locati
 To facilitate the process of creating a manifest, `golem-sdk` accepts multiple forms of image argument, where some of them will automatically resolve the URL and/or hash.
 Please consult the table below for more details:
 
-| Argument                           | `--image-hash`               | Example                                                                                       | Notes                                                                                             |
-| ---------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Image tag                          | automatically resolved       | `golem/node:latest`                                                                           | Image hash will be fetched from [https://registry.golem.network]. This is the recommended method. |
-| Image hash                         | resolved from image argument | `3d6c48bb4c192708168d53cee4f36876b263b7745c3a3c239c6749cd`                                    | Image URL will point to [https://registry.golem.network]                                          |
-| URL to registry.golem.network      | automatically resolved       | `https://registry.golem.network/v1/image/download?tag=golem-examples/blender:2.80&https=true` |                                                                                                   |
-| URL to arbitrary download location | hash is needed               | `https://example.com/my-image`                                                                |                                                                                                   |
+| Argument format                    |  Example                     | Is `--image-hash`  required?                             | Notes |
+| ---------------------------------- | ---------------------------- | ---------------------------------------------------------|-------------------------------------------- |
+| Image tag                           | `golem/node:latest`         | No, it will be automatically resolved. | Image hash is fetched from [https://registry.golem.network]. It is the recommended method. |
+| Image hash | `3d6c48bb4c192708168d53cee4f36876b263b7745c3a3c239c6749cd`| No, it is resolved from the image argument.  | Image URL will point to [https://registry.golem.network] |
+| URL to registry.golem.network | `https://registry.golem.network/v1/image/download?tag=golem-examples/blender:2.80&https=true`| No, it is automatically resolved.  | |
+| URL to arbitrary download location | `https://example.com/my-image` | Yes, image-hash is required.  | Image is calculated by the gvmkit-build conversion tool. |
 
 If the hash is not provided or resolved, you will get a warning that the manifest will not be usable until you provide it manually.
 
 ### Adding outbound URLs
 
-To be able to access the internet from the Golem network, your application needs to declare the outbound URLs it will be using inside its manifest.
+For your application to access the Internet from the Golem network, the manifest must include the outbound URLs the application will be using.
 
-There is a default set of URLs that providers may allow your application to use ([default whitelist](https://github.com/golemfactory/ya-installer-resources/tree/main/whitelist)).
-To use URLs from outside of this whitelist, you need to provide a signed manifest that can be validated by certificates issued by Golem.
-
-**NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on [Discord](https://chat.golem.network) if you need to use URLs outside the default whitelist.
-
-You can use this command multiple times to update URLs in the manifest, and you can pass multiple URLs at once.
+The default set of URLs that providers may allow your application to use is available ([here](https://github.com/golemfactory/ya-installer-resources/tree/main/whitelist)). Note providers can modify the content of the list.
 
 #### Example: Simple use
 
-This command will update the manifest file with the URL.
+This command will update the manifest file with the provided URL:
 
 ```shell
 golem-sdk manifest net add-outbound https://golem.network
 ```
+You can use this command multiple times to add additional URLs to the manifest or pass many URLs in a single run:
 
 #### Example: Multiple URLs
 
@@ -122,11 +117,7 @@ golem-sdk manifest net add-outbound https://golem.network https://github.com htt
 
 ### Signing the manifest
 
-To use URLs outside the default whitelist, you need to sign the manifest with a key provided by Golem.
-
-**NOTE:** Currently there is no process for obtaining the certificate needed to validate the manifest signature. Please contact us on [Discord](https://chat.golem.network) if you need to use URLs outside the default whitelist.
-
-If your private key is encrypted, you will need to provide the correct passphrase (`-p` or `--passphrase` option).
+If the provider configured an audited-payload rule for URLs outside the whitelist, you can get access to such URLs, on the provision they are declared in the manifest, and the manifest is signed by the key linked with the certificate accepted by the provider.	
 
 To sign the manifest, run:
 
@@ -134,6 +125,7 @@ To sign the manifest, run:
 golem-sdk manifest sign -k <private-key>
 ```
 
+If your private key is encrypted, you will need to provide the correct passphrase (`-p` or `--passphrase` option).
 This command will produce a signature file (by default `manifest.sig`) that you will need to use in your application.
 
 ### Verifying the signature
