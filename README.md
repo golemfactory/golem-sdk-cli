@@ -76,7 +76,7 @@ golem-sdk manifest create <image>
 
 If you have a `package.json` file in your project, it will be used to fill in the `name`, `version`, and `description` fields of the manifest. Otherwise, you will need to provide them manually.
 
-The provided `image` argument should identify the GVMI image that will be used by your application. You cacn learn more about Golem images [here](https://docs.golem.network/docs/creators/javascript/guides/golem-images).
+The provided `image` argument should identify the GVMI image that will be used by your application. You can learn more about Golem images [here](https://docs.golem.network/docs/creators/javascript/guides/golem-images).
 
 #### Image
 
