@@ -70,7 +70,7 @@ The `golem-sdk` CLI allows users to create and update the manifest file. By defa
 To create a new Golem Manifest with `golem-sdk` CLI, run:
 
 ```shell
-golem-sdk manifest create <image> [--image-hash hash] 
+golem-sdk manifest create <image> [--image-hash hash]
 ```
 
 The `image` argument should identify the GVMI image used by your application. The tools accept a few formats which are explained in the table below. You can learn more about Golem images [here](https://docs.golem.network/docs/creators/javascript/guides/golem-images).
@@ -83,12 +83,12 @@ The manifest needs to contain the image URL pointing to the GVMI download locati
 To facilitate the process of creating a manifest, `golem-sdk` accepts multiple forms of image argument, where some of them will automatically resolve the URL and/or hash.
 Please consult the table below for more details:
 
-| Argument format                    |  Example                     | Is `--image-hash`  required?                             | Notes |
-| ---------------------------------- | ---------------------------- | ---------------------------------------------------------|-------------------------------------------- |
-| Image tag                           | `golem/node:latest`         | No, it will be automatically resolved. | Image hash is fetched from [https://registry.golem.network]. It is the recommended method. |
-| Image hash | `3d6c48bb4c192708168d53cee4f36876b263b7745c3a3c239c6749cd`| No, it is resolved from the image argument.  | Image URL will point to [https://registry.golem.network] |
-| URL to registry.golem.network | `https://registry.golem.network/v1/image/download?tag=golem-examples/blender:2.80&https=true`| No, it is automatically resolved.  | |
-| URL to arbitrary download location | `https://example.com/my-image` | Yes, image-hash is required.  | Image is calculated by the gvmkit-build conversion tool. |
+| Argument format                    | Example                                                                                       | Is `--image-hash` required?                 | Notes                                                                                      |
+| ---------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Image tag                          | `golem/node:latest`                                                                           | No, it will be automatically resolved.      | Image hash is fetched from [https://registry.golem.network]. It is the recommended method. |
+| Image hash                         | `3d6c48bb4c192708168d53cee4f36876b263b7745c3a3c239c6749cd`                                    | No, it is resolved from the image argument. | Image URL will point to [https://registry.golem.network]                                   |
+| URL to registry.golem.network      | `https://registry.golem.network/v1/image/download?tag=golem-examples/blender:2.80&https=true` | No, it is automatically resolved.           |                                                                                            |
+| URL to arbitrary download location | `https://example.com/my-image`                                                                | Yes, image-hash is required.                | Image is calculated by the gvmkit-build conversion tool.                                   |
 
 If the hash is not provided or resolved, you will get a warning that the manifest will not be usable until you provide it manually.
 
@@ -105,6 +105,7 @@ This command will update the manifest file with the provided URL:
 ```shell
 golem-sdk manifest net add-outbound https://golem.network
 ```
+
 You can use this command multiple times to add additional URLs to the manifest or pass many URLs in a single run:
 
 #### Example: Multiple URLs
@@ -117,7 +118,7 @@ golem-sdk manifest net add-outbound https://golem.network https://github.com htt
 
 ### Signing the manifest
 
-If the provider configured an audited-payload rule for URLs outside the whitelist, you can get access to such URLs, on the provision they are declared in the manifest, and the manifest is signed by the key linked with the certificate accepted by the provider.	
+If the provider configured an audited-payload rule for URLs outside the whitelist, you can get access to such URLs, on the provision they are declared in the manifest, and the manifest is signed by the key linked with the certificate accepted by the provider.
 
 To sign the manifest, run:
 
