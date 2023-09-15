@@ -18,10 +18,11 @@ async function resolveTaskPackageUrl(tag: string): Promise<ImageInfo> {
 
   const response = await fetch(url);
   if (response.status === 404) {
-    // TODO: Print url on debug and stop using exceptions.
-    throw new Error(`Error: Image ${tag} not found.`);
+    console.error(`Error: Image ${tag} not found in image registry.`);
+    process.exit(1);
   } else if (response.status != 200) {
-    throw Error(`Failed to fetch image information: ${response.status} ${response.statusText}`);
+    console.error(`Error: Failed to fetch image information of ${tag} from image registry: ${response.statusText}`);
+    process.exit(1);
   }
 
   const data = (await response.json()) as { https: string; http: string; sha3: string };
