@@ -57,7 +57,7 @@ Now `golem-sdk` command should be available in your system.
 Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). As such, it is being
 developed in parallel with the SDK and new features will be added as the SDK evolves or new use cases are identified.
 
-If you see a feature missing or a possible JS SDK user experience improvement we could implement, please open an issue or a pull request.
+If you see a feature missing or a possible Golem SDK user experience improvement we could implement, please open an issue or a pull request.
 
 ### Golem Manifest
 
@@ -178,6 +178,6 @@ The Pull Request should describe what changes you've made, what's the purpose of
 
 ## Licensing
 
-The code in this project is licensed under the LGPL-3 license.
+The code in this project is licensed under the GPL-3 license.
 
 See [LICENSE](LICENSE) for more information.
