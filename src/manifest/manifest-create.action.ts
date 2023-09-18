@@ -179,7 +179,7 @@ function validateImageInfo(imageInfo: ImageInfo) {
   try {
     new URL(imageInfo.url);
   } catch (e) {
-    console.error(`Error: Failed to parse xx image URL ${imageInfo.url}: ${e}`);
+    console.error(`Error: Failed to parse image URL ${imageInfo.url}: ${e}`);
     process.exit(1);
   }
 
