@@ -50,12 +50,11 @@ To make the CLI available in your system, run:
 npm link
 ```
 
-Now `golem-sdk` command should be available in your system.
+Now, the `golem-sdk` command should be available in your system.
 
 ## Features
 
-Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). As such, it is being
-developed in parallel with the SDK and new features will be added as the SDK evolves or new use cases are identified.
+Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). It is developed in parallel with the SDK, and new features are added as the SDK evolves or new use cases emerge
 
 If you see a feature missing or a possible Golem SDK user experience improvement we could implement, please open an issue or a pull request.
 
@@ -67,7 +66,7 @@ The `golem-sdk` CLI allows users to create and update the manifest file. By defa
 
 ### Creating a Golem Manifest
 
-To create a new Golem Manifest with `golem-sdk` CLI, run:
+To create a new Golem Manifest with the `golem-sdk` CLI, run:
 
 ```shell
 golem-sdk manifest create <image> [--image-hash hash]
@@ -75,7 +74,7 @@ golem-sdk manifest create <image> [--image-hash hash]
 
 The `image` argument should identify the GVMI image used by your application. The tools accept a few formats which are explained in the table below. You can learn more about Golem images [here](https://docs.golem.network/docs/creators/javascript/guides/golem-images).
 
-If you have a `package.json` file in your project, the tool will use `name`, `version`, and `description` fields from this file to fill fields in the manifest. Otherwise, you will need to provide them manually.
+If you have a `package.json` file in your project, the tool will use the `name`, `version`, and `description` fields from the file to fill in the fields in the manifest. Otherwise, you will need to provide them manually.
 
 #### Image
 
@@ -118,7 +117,7 @@ golem-sdk manifest net add-outbound https://golem.network https://github.com htt
 
 ### Signing the manifest
 
-If the provider configured an audited-payload rule for URLs outside the whitelist, you can get access to such URLs, on the provision they are declared in the manifest, and the manifest is signed by the key linked with the certificate accepted by the provider.
+If the provider has set up an audited-payload rule for URLs not on the whitelist, you can gain access to these URLs. However, they must be declared in the manifest, and the manifest is signed by the key linked with the certificate accepted by the provider.
 
 To sign the manifest, run:
 
