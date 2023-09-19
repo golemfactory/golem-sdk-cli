@@ -1,0 +1,25 @@
+{
+  "name": "nodejs-golem-app",
+  "version": "1.0.0",
+  "description": "NodeJS script using Go",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "run": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [
+    "golem",
+    "network",
+    "application"
+  ],
+  "dependencies": {
+    "@golem-sdk/golem-js": "^0.11.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@golem-sdk/cli": "^1.0.0-beta.1"
+  }
+}

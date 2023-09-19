@@ -1,0 +1,6 @@
+.*
+tsconfig.json
+node_modules/
+data/**/package-lock.json
+data/**/node_modules/
+src/
