@@ -21,3 +21,18 @@ export async function checkFileOverwrite(
     // File does not exist, that's fine.
   }
 }
+
+export async function assertFileExists(name: string, path: string, extraHelp?: string): Promise<void> {
+  extraHelp = extraHelp ? ` ${extraHelp}` : "";
+  try {
+    const stats = await stat(path);
+
+    if (!stats.isFile()) {
+      console.error(`Error: "${path}" is not a file.${extraHelp}`);
+      process.exit(1);
+    }
+  } catch (e) {
+    console.error(`Error: ${name} "${path}" not found.${extraHelp}`);
+    process.exit(1);
+  }
+}

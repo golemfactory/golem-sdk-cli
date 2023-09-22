@@ -1,23 +1,10 @@
 import { ManifestDto } from "./dto";
-import { Stats } from "fs";
-import { readFile, stat } from "fs/promises";
+import { readFile } from "fs/promises";
 import schema from "./computation-payload-manifest.schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
 export async function readManifest(filename: string): Promise<ManifestDto> {
-  let fileStats: Stats;
-
-  try {
-    fileStats = await stat(filename);
-  } catch (e) {
-    throw new Error(`Error: Manifest file ${filename} can't be read: ${e}`);
-  }
-
-  if (!fileStats.isFile()) {
-    throw new Error(`Error: Manifest file ${filename} is not a file.`);
-  }
-
   let data: Buffer;
   try {
     data = await readFile(filename);

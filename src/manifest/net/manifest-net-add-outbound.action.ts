@@ -4,6 +4,7 @@ import { ManifestCompManifestDto } from "../dto";
 import { merge } from "lodash";
 import { writeFile } from "fs/promises";
 import { combineUniqueArrays } from "../../lib/data";
+import { assertFileExists } from "../../lib/file";
 
 /**
  * Parse provided urls and report error if any of them are invalid.
@@ -15,16 +16,18 @@ function parseUrls(urls: string[]): URL[] {
 
   urls.forEach((url) => {
     try {
-      parsed.push(new URL(url));
+      const parsedUrl = new URL(url);
+      // TODO: Filter only supported protocols. Problem: we don't know yet what is supported.
+      parsed.push(parsedUrl);
     } catch (e) {
       errors.push(url);
     }
   });
 
   if (errors.length) {
-    console.error("Invalid URLs:");
+    console.error("Error: Invalid URLs provided:");
     console.error(errors.map((url) => `- ${url}`).join("\n"));
-    throw new Error("Invalid URL(s) provided.");
+    process.exit(1);
   }
 
   return parsed;
@@ -34,6 +37,8 @@ export async function manifestNetAddOutboundAction(
   urls: string[],
   options: ManifestNetAddOutboundOptions,
 ): Promise<void> {
+  await assertFileExists("Manifest file", options.manifest, "Check --manifest option.");
+
   const parsedUrls = parseUrls(urls);
   const protocols = parsedUrls.map((url) => url.protocol.replace(/:$/, ""));
 

@@ -2,9 +2,13 @@ import { ManifestSignOptions } from "./manifest-sign.options";
 import { readManifest } from "./manifest-utils";
 import { readFile, writeFile } from "fs/promises";
 import { createSign } from "crypto";
+import { assertFileExists } from "../lib/file";
 
 export async function manifestSignAction(options: ManifestSignOptions): Promise<void> {
-  // Read and validate the manifest.
+  await assertFileExists("Manifest file", options.manifest, "Check --manifest option.");
+  await assertFileExists("Private key file", options.keyFile, "Check --key-file option.");
+
+  // Validate the manifest. We don't need parsed data, so output is ignored.
   await readManifest(options.manifest);
 
   // Read manifest buffer.
@@ -12,16 +16,42 @@ export async function manifestSignAction(options: ManifestSignOptions): Promise<
   const manifestBase64 = manifestBuffer.toString("base64");
 
   const keyFile = await readFile(options.keyFile);
+  const passphraseRequired = keyFile.toString("ascii").includes("BEGIN ENCRYPTED PRIVATE KEY");
 
-  // Parse key file to KeyObject?
+  if (passphraseRequired && !options.passphrase) {
+    console.error("Error: Private key file is encrypted and no passphrase was provided. Use --passphrase option.");
+    process.exit(1);
+  } else if (!passphraseRequired && options.passphrase) {
+    console.error("Error: Private key file is not encrypted and passphrase was provided. Remove --passphrase option.");
+    process.exit(1);
+  }
+
+  // Sign the manifest.
+  let signature: Buffer;
   const sign = createSign("RSA-SHA256");
   sign.update(manifestBase64);
-  const signature = sign.sign({
-    key: keyFile,
-    // FIXME: Allow secure passphrase input and detect if a passphrase is needed.
-    passphrase: options.passphrase,
-  });
+
+  try {
+    signature = sign.sign({
+      key: keyFile,
+      passphrase: options.passphrase,
+    });
+  } catch (e) {
+    if (e instanceof Error && "code" in e) {
+      if (e.code === "ERR_OSSL_BAD_DECRYPT") {
+        console.error(`Error: Wrong passphrase provided for the private key ${options.keyFile}.`);
+        process.exit(1);
+      } else if (e.code === "ERR_OSSL_UNSUPPORTED") {
+        console.error(`Error: Private key file ${options.keyFile} is not supported.`);
+        process.exit(1);
+      }
+    }
+
+    throw e;
+  }
 
   // write signature to options.signatureFile.
   await writeFile(options.signatureFile, Buffer.from(signature).toString("base64"), "ascii");
+
+  console.log("Signed the manifest file and stored the signature in %s", options.signatureFile);
 }

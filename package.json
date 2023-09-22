@@ -1,15 +1,17 @@
 {
   "name": "@golem-sdk/cli",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "CLI for Golem SDK",
-  "main": "dist/main.js",
   "repository": {
     "type": "github",
     "url": "github:GolemFactory/golem-sdk-cli"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc --build",
     "watch": "tsc --watch",
     "lint": "npm run lint:ts && npm run lint:eslint",
     "lint:ts": "tsc --project tsconfig.json --noEmit",
@@ -32,21 +34,19 @@
     "marketplace",
     "cli"
   ],
-  "files": [
-    "dist"
-  ],
   "author": "GolemFactory <contact@golem.network>",
-  "license": "LGPL-3.0",
+  "license": "GPL-3.0",
   "engines": {
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "@golem-sdk/golem-js": "^0.10.1",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "commander": "^11.0.0",
+    "enquirer": "^2.4.1",
     "lodash": "^4.17.21",
     "luxon": "^3.4.3",
+    "new-find-package-json": "^2.0.0",
     "node-fetch": "^2.7.0",
     "typescript": "^5.2.2"
   },

@@ -5,3 +5,7 @@ dist/
 .DS_Store
 
 manifest.json
+*.sig
+
+data/project-templates/**/package-lock.json
+data/project-templates/**/node_modules
