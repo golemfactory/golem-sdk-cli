@@ -31,6 +31,8 @@ dotenv.config();
 
   try {
     // Your code goes here
+    const result = await executor.run((ctx) => ctx.run("node -v"));
+    console.log("Version of NodeJS on Provider:", result.stdout.trim());
   } catch (err) {
     console.error("Running the task on Golem failed due to", err);
   } finally {
