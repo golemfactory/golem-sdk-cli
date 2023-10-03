@@ -58,6 +58,23 @@ Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfa
 
 If you see a feature missing or a possible Golem SDK user experience improvement we could implement, please open an issue or a pull request.
 
+### Create a new Golem Application
+
+The fastest way to get started with Golem Network is to use `golem-sdk new` to create a new application from a template.
+
+```shell
+golem-sdk new
+```
+
+You will be asked a series of questions about your application and the CLI will use your answers to generate a new Golem Application.
+
+The first question will be the project name. The CLI will use it to create a new directory for your application in the current directory. You can use the `--path` option to override this behaviour.
+
+Note: The command will abort if the directory already exists.
+
+You can provide all the needed information from command line too. Type `golem-sdk new --help` to see the list of available options.
+
+
 ### Golem Manifest
 
 [Golem Manifest](https://docs.golem.network/docs/golem/payload-manifest) is a JSON document that describes your Golem application. While it is not necessary for simple applications, you will need it if you want to access advanced features of the Golem SDK, like access to the Internet (outbound).
