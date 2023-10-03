@@ -74,7 +74,6 @@ Note: The command will abort if the directory already exists.
 
 You can provide all the needed information from command line too. Type `golem-sdk new --help` to see the list of available options.
 
-
 ### Golem Manifest
 
 [Golem Manifest](https://docs.golem.network/docs/golem/payload-manifest) is a JSON document that describes your Golem application. While it is not necessary for simple applications, you will need it if you want to access advanced features of the Golem SDK, like access to the Internet (outbound).
