@@ -12,20 +12,20 @@ export interface PackageManager {
  */
 export function getPackageManager(userAgent?: string) {
   const result: PackageManager = {
-    name: 'npm',
-  }
+    name: "npm",
+  };
 
-  const ua = userAgent ?? process.env['npm_config_user_agent'];
+  const ua = userAgent ?? process.env["npm_config_user_agent"];
   if (!ua) {
     return result;
   }
 
-  const split = ua.split(' ')[0];
+  const split = ua.split(" ")[0];
   if (!split) {
     return result;
   }
 
-  const [name, version] = split.split('/');
+  const [name, version] = split.split("/");
   if (name) {
     result.name = name;
   }

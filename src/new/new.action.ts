@@ -125,22 +125,22 @@ async function updatePackageJson(projectPath: string, data: PackageJsonBasic): P
 
 function installDependencies(options: NewOptions, projectPath: string) {
   if (options.skipInstall) {
-    console.log('Skipping dependency installation as requested.');
+    console.log("Skipping dependency installation as requested.");
     return;
   }
 
-  console.log('Installing dependencies...');
+  console.log("Installing dependencies...");
 
   const pkg = getPackageManager();
   const oldWd = process.cwd();
-  const args = pkg.name === 'yarn' ? [] : ['install'];
+  const args = pkg.name === "yarn" ? [] : ["install"];
 
   process.chdir(projectPath);
-  const result = spawnSync(pkg.name, args, { stdio: 'inherit' });
+  const result = spawnSync(pkg.name, args, { stdio: "inherit" });
   process.chdir(oldWd);
 
   if (result.error) {
-    console.error('Error: There was a problem installing dependencies. You may need to install them manually.');
+    console.error("Error: There was a problem installing dependencies. You may need to install them manually.");
   }
 }
 
