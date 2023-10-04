@@ -137,7 +137,7 @@ export async function newAction(providedName: string, options: NewOptions) {
   }
 
   const description = await getDescription(options.description);
-  const version = await getVersion(options.version);
+  const version = await getVersion(options.appVersion);
   const author = options.author;
 
   console.log(`Creating a new Golem app in ${projectPath}.`);
