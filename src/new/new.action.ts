@@ -49,8 +49,10 @@ async function getTemplate(providedTemplate?: string): Promise<string> {
       name: "template",
       message: "Select a project template",
       choices: [
-        { name: "js-node", hint: "Plain Javascript CLI application" },
-        // { name: "js-webapp", hint: "Plain Javascript Express based web application" },
+        { name: "ts-node", hint: "TypeScript CLI application (CommonJS)" },
+        { name: "ts-node-esm", hint: "TypeScript CLI application (ESM)" },
+        { name: "js-node", hint: "Plain Javascript CLI application (CommonJS)" },
+        { name: "js-node-esm", hint: "Plain Javascript CLI application (ESM)" },
       ],
     })) as { template: string };
 
