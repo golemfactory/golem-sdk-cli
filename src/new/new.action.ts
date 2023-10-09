@@ -4,6 +4,8 @@ import { prompt } from "enquirer";
 import { join } from "path";
 import { existsSync } from "fs";
 import { cp, readFile, writeFile } from "fs/promises";
+import { getPackageManager } from "../lib/pkg";
+import { spawnSync } from "child_process";
 
 async function getName(providedName: string): Promise<string> {
   if (!providedName) {
@@ -121,6 +123,27 @@ async function updatePackageJson(projectPath: string, data: PackageJsonBasic): P
   }
 }
 
+function installDependencies(options: NewOptions, projectPath: string) {
+  if (options.skipInstall) {
+    console.log("Skipping dependency installation as requested.");
+    return;
+  }
+
+  console.log("Installing dependencies...");
+
+  const pkg = getPackageManager();
+  const oldWd = process.cwd();
+  const args = pkg.name === "yarn" ? [] : ["install"];
+
+  process.chdir(projectPath);
+  const result = spawnSync(pkg.name, args, { stdio: "inherit" });
+  process.chdir(oldWd);
+
+  if (result.error) {
+    console.error("Error: There was a problem installing dependencies. You may need to install them manually.");
+  }
+}
+
 export async function newAction(providedName: string, options: NewOptions) {
   const name = await getName(providedName);
   const projectPath = options.path ?? join(process.cwd(), name);
@@ -157,7 +180,7 @@ export async function newAction(providedName: string, options: NewOptions) {
     author,
   });
 
-  // TODO: Consider running npm install (or yarn, or whatever).
+  installDependencies(options, projectPath);
 
   console.log(`Project created successfully in ${projectPath}.`);
 
