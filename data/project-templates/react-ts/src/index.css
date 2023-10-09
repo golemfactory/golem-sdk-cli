@@ -4,8 +4,8 @@
   font-weight: 400;
 
   color-scheme: light dark;
-    color: #213547;
-    background-color: #ffffff;
+  color: #213547;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,8 +20,7 @@ a {
   text-decoration: inherit;
 }
 a:hover {
-    color: #747bff;
-
+  color: #747bff;
 }
 
 body {
