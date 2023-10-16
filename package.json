@@ -15,7 +15,7 @@
     "watch": "tsc --watch",
     "lint": "npm run lint:ts && npm run lint:eslint",
     "lint:ts": "tsc --project tsconfig.json --noEmit",
-    "lint:eslint": "eslint .",
+    "lint:eslint": "eslint --config .eslintrc --no-eslintrc .",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "prepare": "husky install"
