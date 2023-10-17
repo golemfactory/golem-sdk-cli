@@ -4,6 +4,8 @@ import { prompt } from "enquirer";
 import { join } from "path";
 import { existsSync } from "fs";
 import { cp, readFile, writeFile } from "fs/promises";
+import { getPackageManager } from "../lib/pkg";
+import { spawnSync } from "child_process";
 
 async function getName(providedName: string): Promise<string> {
   if (!providedName) {
@@ -53,6 +55,9 @@ async function getTemplate(providedTemplate?: string): Promise<string> {
         { name: "ts-node-esm", hint: "TypeScript CLI application (ESM)" },
         { name: "js-node", hint: "Plain Javascript CLI application (CommonJS)" },
         { name: "js-node-esm", hint: "Plain Javascript CLI application (ESM)" },
+        { name: "react-js", hint: "React web application (with Vite and plain Javascript)" },
+        { name: "react-ts", hint: "React web application (with Vite and Typescript)" },
+        // { name: "js-webapp", hint: "Plain Javascript Express based web application" },
       ],
     })) as { template: string };
 
@@ -123,6 +128,27 @@ async function updatePackageJson(projectPath: string, data: PackageJsonBasic): P
   }
 }
 
+function installDependencies(options: NewOptions, projectPath: string) {
+  if (options.skipInstall) {
+    console.log("Skipping dependency installation as requested.");
+    return;
+  }
+
+  console.log("Installing dependencies...");
+
+  const pkg = getPackageManager();
+  const oldWd = process.cwd();
+  const args = pkg.name === "yarn" ? [] : ["install"];
+
+  process.chdir(projectPath);
+  const result = spawnSync(pkg.name, args, { stdio: "inherit" });
+  process.chdir(oldWd);
+
+  if (result.error) {
+    console.error("Error: There was a problem installing dependencies. You may need to install them manually.");
+  }
+}
+
 export async function newAction(providedName: string, options: NewOptions) {
   const name = await getName(providedName);
   const projectPath = options.path ?? join(process.cwd(), name);
@@ -159,14 +185,31 @@ export async function newAction(providedName: string, options: NewOptions) {
     author,
   });
 
-  // TODO: Consider running npm install (or yarn, or whatever).
+  installDependencies(options, projectPath);
+
+  const isReactProject = template.startsWith("react");
+  if (isReactProject) {
+    const envFile = join(projectPath, ".env");
+    try {
+      await writeFile(envFile, `VITE_YAGNA_APPKEY=${process.env.YAGNA_APPKEY || ""}`);
+    } catch (e) {
+      console.error(`Error: Failed to write ${envFile}: ${e}`);
+      process.exit(1);
+    }
+  }
 
   console.log(`Project created successfully in ${projectPath}.`);
 
   if (!process.env.YAGNA_APPKEY) {
-    console.log(
-      "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. You will need to define it or provide a .env file with it to run your new appplication.",
-    );
+    if (isReactProject) {
+      console.log(
+        "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. To successfully run your new React application, you will need to define the VITE_YAGNA_APPKEY environment variable in your .env file.",
+      );
+    } else {
+      console.log(
+        "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. You will need to define it or provide a .env file with it to run your new appplication.",
+      );
+    }
   }
 
   // TODO: Show some next steps, or pull it from template directory.
