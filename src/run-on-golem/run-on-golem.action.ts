@@ -1,10 +1,10 @@
-import { ShellOptions } from "./shell.options";
+import { RunOnGolemOptions } from "./run-on-golem.options";
 import { createInterface } from "readline/promises";
 import { parse, ParseEntry } from "shell-quote";
 import { CommanderError } from "commander";
-import { ParseError, ShellError } from "./shell.errors";
+import { ParseError, ShellError } from "./errors";
 import { ExecutorOptions, TaskExecutor } from "@golem-sdk/golem-js";
-import { assertFileExists } from "../lib/file";
+import { assertFileExists, checkFileExists } from "../lib/file";
 import { readFile } from "fs/promises";
 import { TaskAPIContext, VarsType } from "./shell-context";
 import * as fs from "fs";
@@ -157,7 +157,7 @@ function execConsole(context: TaskAPIContext): Promise<void> {
       input: process.stdin,
       output: process.stdout,
       terminal: true, // process.stdout.isTTY,
-      prompt: "cmd> ",
+      prompt: "golem> ",
     });
     rl.prompt();
     rl.on("line", (line) => {
@@ -175,7 +175,7 @@ function execConsole(context: TaskAPIContext): Promise<void> {
   });
 }
 
-async function createExecutor(options: ShellOptions) {
+async function createExecutor(options: RunOnGolemOptions) {
   const timeout = options.timeout ? parseInt(options.timeout, 10) : 60 * 60;
   const opts: ExecutorOptions = {
     taskTimeout: 1000 * timeout,
@@ -186,7 +186,18 @@ async function createExecutor(options: ShellOptions) {
     opts.package = options.image;
   } else {
     console.log(`Creating task executor using manifest file ${options.manifest}`);
-    await assertFileExists("Manifest file", options.manifest);
+    if (!(await checkFileExists("Manifest file", options.manifest))) {
+      console.log("You can create a manifest file by running:\n\n\tgolem-sdk manifest create\n");
+      console.log(
+        "You can specify a manifest file to use by using the --manifest option:" +
+          "\n\n\tgolem-sdk run-on-golem --manifest <manifest>\n",
+      );
+      console.log(
+        "If you want to use an image directly instead of a manifest file, use the --image option:" +
+          "\n\n\tgolem-sdk run-on-golem --image <image>\n",
+      );
+      process.exit(1);
+    }
 
     // TODO: add option for signed manifests.
     opts.manifest = (await readFile(options.manifest)).toString("base64");
@@ -195,7 +206,7 @@ async function createExecutor(options: ShellOptions) {
   return TaskExecutor.create(opts);
 }
 
-export async function shellAction(files: string[], options: ShellOptions) {
+export async function runOnGolemAction(files: string[], options: RunOnGolemOptions) {
   // Prepare shell variables.
   const vars: VarsType = {
     ...(options.env ? process.env : {}),
@@ -207,7 +218,7 @@ export async function shellAction(files: string[], options: ShellOptions) {
 
   // Handle SIGINT and SIGTERM.
   process.on("SIGINT", async () => {
-    console.log("SIGINT received, terminating...");
+    console.log("SIGINT received, terminating shell...");
     if (!context.terminated) {
       await context.terminate();
     }
@@ -215,7 +226,7 @@ export async function shellAction(files: string[], options: ShellOptions) {
   });
 
   process.on("SIGTERM", async () => {
-    console.log("SIGTERM received, terminating...");
+    console.log("SIGTERM received, terminating shell...");
     if (!context.terminated) {
       await context.terminate();
     }

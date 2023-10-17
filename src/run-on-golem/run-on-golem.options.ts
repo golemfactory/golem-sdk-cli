@@ -1,4 +1,4 @@
-export interface ShellOptions {
+export interface RunOnGolemOptions {
   manifest: string; // At worse, it will contain a default value
   image?: string;
   execute?: string;

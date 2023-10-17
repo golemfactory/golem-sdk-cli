@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { ShellOptions } from "./shell.options";
+import { RunOnGolemOptions } from "./run-on-golem.options";
 
 /*
 
@@ -40,9 +40,9 @@ More features ideas:
 [ ] --silent so the shell doesn't use any stdout by itself
  */
 
-export const shellCommand = new Command("shell");
+export const runOnGolemCommand = new Command("run-on-golem");
 
-shellCommand
+runOnGolemCommand
   .summary("Run task API shell")
   .option(
     "--image <image>",
@@ -60,7 +60,7 @@ shellCommand
       "\n\nIf either --execute or batch files are used, upon completion of the commands, the shell will exit. This behaviour can be changed by using --interactive option.",
   )
   .allowExcessArguments(false)
-  .action(async (file: string[], options: ShellOptions) => {
-    const action = await import("./shell.action.js");
-    await action.default.shellAction(file, options);
+  .action(async (file: string[], options: RunOnGolemOptions) => {
+    const action = await import("./run-on-golem.action.js");
+    await action.default.runOnGolemAction(file, options);
   });
