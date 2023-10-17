@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "NodeJS script using Golem Network",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/",
     "test": "echo \"Error: no test specified\" && exit 1"

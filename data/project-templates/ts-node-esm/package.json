@@ -1,10 +1,13 @@
 {
   "name": "nodejs-golem-app",
+  "type": "module",
   "version": "1.0.0",
   "description": "NodeJS script using Golem Network",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "node src/",
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
