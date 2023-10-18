@@ -100,14 +100,18 @@ export function shellProgram(pContext: ProgramContext): Command {
       let stdout = result.stdout as string;
       if (options.stderr === "-") stdout += result.stderr as string;
 
-      if (options.stdout) {
-        await writeFile(options.stdout, stdout, { encoding: "utf-8" });
-      } else {
-        process.stdout.write(result.stdout as string);
+      if (stdout !== null) {
+        if (options.stdout) {
+          await writeFile(options.stdout, stdout, { encoding: "utf-8" });
+        } else {
+          process.stdout.write(result.stdout as string);
+        }
       }
 
-      if (options.stderr && options.stderr !== "-") {
-        process.stderr.write(result.stderr as string);
+      if (result.stderr !== null) {
+        if (options.stderr && options.stderr !== "-") {
+          process.stderr.write(result.stderr as string);
+        }
       }
     });
 
