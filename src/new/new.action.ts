@@ -137,15 +137,16 @@ function installDependencies(options: NewOptions, projectPath: string) {
   console.log("Installing dependencies...");
 
   const pkg = getPackageManager();
-  const oldWd = process.cwd();
   const args = pkg.name === "yarn" ? [] : ["install"];
 
-  process.chdir(projectPath);
-  const result = spawnSync(pkg.name, args, { stdio: "inherit" });
-  process.chdir(oldWd);
+  const result = spawnSync(pkg.name, args, { cwd: projectPath, stdio: "inherit" });
 
   if (result.error) {
-    console.error("Error: There was a problem installing dependencies. You may need to install them manually.");
+    console.error(`Error: There was a problem installing dependencies: ${result.error.message}`);
+    console.error("Note: You may need to install dependencies manually.");
+  } else if (result.status !== 0) {
+    console.error(`Error: Process existed with status code ${result.status}.`);
+    console.error("Note: You may need to install dependencies manually.");
   }
 }
 
