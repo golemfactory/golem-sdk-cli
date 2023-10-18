@@ -1,5 +1,5 @@
-const dotenv = require("dotenv");
-const { LogLevel, ProposalFilters, TaskExecutor } = require("@golem-sdk/golem-js");
+import * as dotenv from "dotenv";
+import { LogLevel, ProposalFilters, TaskExecutor } from "@golem-sdk/golem-js";
 
 dotenv.config();
 
