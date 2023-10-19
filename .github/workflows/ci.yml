@@ -40,3 +40,5 @@ jobs:
           npm run build
           npm ln
           golem-sdk --version
+          golem-sdk new test-app -t js-node -d 'Test App' -a 'Golem' -v '1.0.0'
+          cd test-app/node_modules
