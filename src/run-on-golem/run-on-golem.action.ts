@@ -179,6 +179,7 @@ async function createExecutor(options: RunOnGolemOptions) {
   const timeout = options.timeout ? parseInt(options.timeout, 10) : 60 * 60;
   const opts: ExecutorOptions = {
     taskTimeout: 1000 * timeout,
+    skipProcessSignals: true,
   };
 
   if (options.image) {
@@ -207,6 +208,31 @@ async function createExecutor(options: RunOnGolemOptions) {
   return TaskExecutor.create(opts);
 }
 
+function installSignalHandlers(context: TaskAPIContext) {
+  const signals = ["SIGINT", "SIGTERM", "SIGBREAK"];
+  let terminating = false;
+
+  const handler = async (signal: string) => {
+    // Can only be called once, repeated signals will be ignored.
+    if (terminating) return;
+    terminating = true;
+
+    console.log(`${signal} received, terminating shell...`);
+
+    // Terminate the context.
+    if (!context.terminated) {
+      await context.terminate();
+    }
+
+    // Exit shell.
+    process.exit(0);
+  };
+
+  signals.forEach((signal) => {
+    process.on(signal, handler);
+  });
+}
+
 export async function runOnGolemAction(files: string[], options: RunOnGolemOptions) {
   // Prepare shell variables.
   const vars: VarsType = {
@@ -217,22 +243,7 @@ export async function runOnGolemAction(files: string[], options: RunOnGolemOptio
   const executor = await createExecutor(options);
   const context = new TaskAPIContext(executor, vars);
 
-  // Handle SIGINT and SIGTERM.
-  process.on("SIGINT", async () => {
-    console.log("SIGINT received, terminating shell...");
-    if (!context.terminated) {
-      await context.terminate();
-    }
-    process.exit(0);
-  });
-
-  process.on("SIGTERM", async () => {
-    console.log("SIGTERM received, terminating shell...");
-    if (!context.terminated) {
-      await context.terminate();
-    }
-    process.exit(0);
-  });
+  installSignalHandlers(context);
 
   try {
     // Do magic so we have a work context.
