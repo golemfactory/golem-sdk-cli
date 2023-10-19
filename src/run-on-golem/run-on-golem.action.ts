@@ -201,6 +201,7 @@ async function createExecutor(options: RunOnGolemOptions) {
 
     // TODO: add option for signed manifests.
     opts.manifest = (await readFile(options.manifest)).toString("base64");
+    opts.capabilities = ["manifest-support"];
   }
 
   return TaskExecutor.create(opts);
