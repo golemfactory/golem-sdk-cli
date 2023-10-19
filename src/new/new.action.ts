@@ -139,7 +139,7 @@ function installDependencies(options: NewOptions, projectPath: string) {
   const pkg = getPackageManager();
   const args = pkg.name === "yarn" ? [] : ["install"];
 
-  const result = spawnSync(pkg.name, args, { cwd: projectPath, stdio: "inherit" });
+  const result = spawnSync(pkg.name, args, { cwd: projectPath, stdio: "inherit", shell: true });
 
   if (result.error) {
     console.error(`Error: There was a problem installing dependencies: ${result.error.message}`);
