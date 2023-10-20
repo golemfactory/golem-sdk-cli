@@ -1,3 +1,5 @@
+![golem-js SDK](./assets/golem-js-logo.png)
+
 # Golem SDK CLI
 
 Golem SDK CLI is a companion tool for the [Golem SDK](https://github.com/golemfactory/golem-js). It accelerates the creation and management of Golem JS projects.
