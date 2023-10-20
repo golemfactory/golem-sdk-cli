@@ -10,7 +10,8 @@ newCommand
   .option("-t, --template <template>", "Template to be used for the project.")
   .option("-d, --description <text>", "Description of the project.")
   .option("-a, --author <name>", "Author of the project.") // TODO: try to read it from git config?
-  .option("-v, --version <version>", "Version of the project.")
+  .option("-v, --app-version <version>", "Version of the project.")
+  .option("--skip-install", "Do not install dependencies.")
   // TODO: implement list-templates?
   // .option("-l, --list-templates", "List available projecttemplates.")
   .argument("[name]", "Name of the project.")

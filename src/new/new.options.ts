@@ -3,7 +3,8 @@ export interface NewOptions {
   description?: string;
   path?: string;
   template?: string;
-  version?: string;
+  appVersion?: string;
+  skipInstall?: boolean;
 }
 
 export const newProjectNameRegEx = /^[a-z0-9-_]+$/;

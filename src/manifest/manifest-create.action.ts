@@ -6,7 +6,7 @@ import fetch from "node-fetch";
 import { DateTime } from "luxon";
 import { findAsync } from "new-find-package-json";
 
-const repoUrl = "https://registry.golem.network";
+const repoUrl = "http://registry.golem.network";
 
 type ImageInfo = {
   url: string;
@@ -28,7 +28,8 @@ async function resolveTaskPackageUrl(tag: string): Promise<ImageInfo> {
   const data = (await response.json()) as { https: string; http: string; sha3: string };
 
   return {
-    url: data.https,
+    // url: data.https,
+    url: data.http,
     hash: `sha3:${data.sha3}`,
   };
 }
@@ -36,7 +37,7 @@ async function resolveTaskPackageUrl(tag: string): Promise<ImageInfo> {
 async function getImageUrlFromTag(tag: string, providedHash?: string): Promise<ImageInfo> {
   if (providedHash) {
     return {
-      url: `${repoUrl}/v1/image/download?tag=${tag}&https=true`,
+      url: `${repoUrl}/v1/image/download?tag=${tag}', //&https=true`,
       hash: providedHash,
     };
   }
@@ -81,7 +82,7 @@ async function getImageUrlFromUrl(url: string): Promise<ImageInfo> {
 
 function getImageUrlFromHash(hash: string): ImageInfo {
   return {
-    url: `${repoUrl}/v1/image/download?hash=${hash}&https=true`,
+    url: `${repoUrl}/v1/image/download?hash=${hash}`, //&https=true`,
     hash: `sha3:${hash}`,
   };
 }
