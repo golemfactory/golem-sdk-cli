@@ -171,6 +171,7 @@ By default, `run-on-golem` will try to use your manifest file from current direc
 or by providing `--image` option.
 
 Example:
+
 ```shell
 golem-sdk run-on-golem --image=golem/node:20-alpine
 ```
@@ -182,6 +183,7 @@ Within the shell, you can quickly test your application by running commands on t
 You can run commands without an interactive shell ether by passing the commands you want to run using the `--execute` option or using a batch file:
 
 Examples:
+
 ```shell
 golem-sdk run-on-golem --execute "upload localfile.txt /golem/input; run 'ls /golem/input'"
 golem-sdk run-on-golem batchfile.txt
