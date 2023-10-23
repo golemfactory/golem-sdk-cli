@@ -162,6 +162,31 @@ Manifest matches signature.
 
 It is important to use this command to make sure the key you are using is compatible with your certificate.
 
+### Run-on-golem
+
+The `run-on-golem` command allows you to run an image on the Golem Network without the need to create a full Golem application.
+Now you can test, debugging and validate images without having to writing a single line of code.
+
+By default, `run-on-golem` will try to use your manifest file from current directory. You can override this behaviour by using the `--manifest` option
+or by providing `--image` option.
+
+Example:
+```shell
+golem-sdk run-on-golem --image=golem/node:20-alpine
+```
+
+Once you run the command, the CLI will deploy the image to one of the providers and you will be presented with an interactive shell. You can type `?` in order to get a list of all available commands.
+
+Within the shell, you can quickly test your application by running commands on the image, as well as uploading and downloading files.
+
+You can run commands without an interactive shell ether by passing the commands you want to run using the `--execute` option or using a batch file:
+
+Examples:
+```shell
+golem-sdk run-on-golem --execute "upload localfile.txt /golem/input; run 'ls /golem/input'"
+golem-sdk run-on-golem batchfile.txt
+```
+
 ## Contributing
 
 If you'd like to contribute to the project, you can fork the repository and create a Pull Request.
