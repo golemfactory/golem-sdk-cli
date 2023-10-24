@@ -15,7 +15,6 @@ export class TaskAPIContext implements ProgramContext {
   startDate = new Date();
 
   private workResolve: () => void = () => {};
-  private workReject: (reason?: any) => void = () => {};
 
   private workerRunning = false;
 
@@ -32,10 +31,9 @@ export class TaskAPIContext implements ProgramContext {
       this.executor
         .run(
           (workContext) =>
-            new Promise((wResolve, wReject) => {
+            new Promise((wResolve) => {
               this.workContext = workContext;
-              this.workResolve = wResolve as () => {};
-              this.workReject = wReject;
+              this.workResolve = wResolve as () => void;
               this.workerRunning = true;
               this.startDate = new Date();
               resolve();

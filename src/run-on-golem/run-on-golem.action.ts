@@ -30,10 +30,10 @@ function parseTokens(tokens: ParseEntry[]): ParseResult[] {
   };
 
   let token: ParseEntry | undefined;
-  let nextToken: ParseEntry | null = null;
+  // let nextToken: ParseEntry | null = null;
 
   while ((token = tokens.shift())) {
-    nextToken = tokens[0] || null;
+    // nextToken = tokens[0] || null;
 
     if (typeof token === "string") {
       current.arguments.push(token);
