@@ -165,10 +165,10 @@ It is important to use this command to make sure the key you are using is compat
 ### Run-on-golem
 
 The `run-on-golem` command allows you to run an image on the Golem Network without the need to create a full Golem application.
-Now you can test, debugging and validate images without having to writing a single line of code.
+Now you can test, debug and validate images without having to writing a single line of code.
 
-By default, `run-on-golem` will try to use your manifest file from current directory. You can override this behaviour by using the `--manifest` option
-or by providing `--image` option.
+By default, `run-on-golem` will try to use your manifest file from the current directory. You can override this behaviour by using the `--manifest` option
+or by providing the `--image` option.
 
 Example:
 
