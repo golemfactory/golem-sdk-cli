@@ -10,6 +10,7 @@ import { TaskAPIContext, VarsType } from "./shell-context";
 import * as fs from "fs";
 import * as readline from "readline";
 import { Events } from "@golem-sdk/golem-js";
+import { shellProgram } from "./shell-program";
 
 enum OutputMode {
   APPEND = 1,
@@ -79,7 +80,10 @@ function parseTokens(tokens: ParseEntry[]): ParseResult[] {
 
 async function execCommand(context: TaskAPIContext, cmd: ParseResult) {
   try {
-    await context.program.parseAsync(cmd.arguments, { from: "user" });
+    // Cannot call parse()/parseAsync() multiple times on the same command object, due to an ignored bug:
+    // https://github.com/tj/commander.js/issues/841
+    const program = shellProgram(context);
+    await program.parseAsync(cmd.arguments, { from: "user" });
   } catch (e) {
     if (e instanceof ShellError) {
       console.error(`Error: ${e.message}`);
