@@ -1,5 +1,3 @@
-import { Command } from "commander";
-import { shellProgram } from "./shell-program";
 import { TaskExecutor } from "@golem-sdk/golem-js";
 import { WorkContext } from "@golem-sdk/golem-js/dist/task";
 import { ProgramContext } from "./context-interface";
@@ -8,7 +6,6 @@ export type VarsType = { [key: string]: string | undefined };
 
 export class TaskAPIContext implements ProgramContext {
   exited = false;
-  program: Command;
   workContext!: WorkContext;
 
   terminated = false;
@@ -21,9 +18,7 @@ export class TaskAPIContext implements ProgramContext {
   constructor(
     public executor: TaskExecutor,
     public vars: VarsType,
-  ) {
-    this.program = shellProgram(this);
-  }
+  ) {}
 
   magic(): Promise<void> {
     // NOTE: This magic is needed because there is no simple (or any) way to create w work context without TaskExecutor.
