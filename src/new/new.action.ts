@@ -209,7 +209,7 @@ export async function newAction(providedName: string, options: NewOptions) {
       );
     } else {
       console.log(
-        "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. You will need to define it or provide a .env file with it to run your new appplication.",
+        "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. You will need to define it or provide a .env file with it to run your new application.",
       );
     }
   }
