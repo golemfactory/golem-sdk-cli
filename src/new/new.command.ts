@@ -13,7 +13,7 @@ newCommand
   .option("-v, --app-version <version>", "Version of the project.")
   .option("--skip-install", "Do not install dependencies.")
   // TODO: implement list-templates?
-  // .option("-l, --list-templates", "List available projecttemplates.")
+  // .option("-l, --list-templates", "List available project templates.")
   .argument("[name]", "Name of the project.")
   .action(async (name: string, options: NewOptions) => {
     const action = await import("./new.action.js");

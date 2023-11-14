@@ -105,7 +105,7 @@ async function getImage(imageSpec: string, providedHash?: string): Promise<Image
     return await getImageUrlFromTag(imageSpec, providedHash);
     // Use package.
   } else if (providedHash) {
-    // imageSpec is an URL and hash is provided.
+    // imageSpec is a URL and hash is provided.
     return {
       url: imageSpec,
       hash: providedHash,
