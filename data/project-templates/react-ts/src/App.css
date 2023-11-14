@@ -30,3 +30,39 @@
   max-width: 32em;
   text-align: left;
 }
+
+.node-version-check-wrapper {
+  padding: 5px;
+}
+
+.node-version-check-task {
+  padding: 5px;
+}
+
+.node-version-check-task-status {
+  padding: 5px;
+  margin: 5px;
+  font-size: 1.9em;
+  background-color: #fafafa;
+  border-radius: 10px;
+}
+
+.text-error {
+  color: red;
+}
+
+.text-progress {
+  color: steelblue;
+}
+
+.bg-progress {
+  background-color: steelblue;
+}
+
+.text-success {
+  color: forestgreen;
+}
+
+.bg-success {
+  background-color: forestgreen;
+}

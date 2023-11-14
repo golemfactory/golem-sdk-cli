@@ -3,6 +3,7 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "./assets/vite.svg";
 import "./App.css";
 import { useYagna } from "@golem-sdk/react";
+import { NodeVersionCheck } from "./components/NodeVersionCheck.jsx";
 
 function App() {
   const { isConnected } = useYagna();
@@ -37,6 +38,7 @@ function App() {
           <code>{`yagna service run --api-allow-origin='${window.location.origin}'`}</code>
         </p>
       )}
+      <div className="card">{isConnected && <NodeVersionCheck />}</div>
       <div className="card">
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
