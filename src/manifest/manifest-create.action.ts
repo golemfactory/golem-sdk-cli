@@ -2,7 +2,6 @@ import { ManifestCreateOptions } from "./manifest-create.options";
 import { ManifestDto, ManifestVersions } from "./dto";
 import { readFile, writeFile } from "fs/promises";
 import { checkFileOverwrite } from "../lib/file";
-import fetch from "node-fetch";
 import { DateTime } from "luxon";
 import { findAsync } from "new-find-package-json";
 
