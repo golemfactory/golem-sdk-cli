@@ -37,7 +37,7 @@
   "author": "GolemFactory <contact@golem.network>",
   "license": "GPL-3.0",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@golem-sdk/golem-js": "^0.12.1",
@@ -48,7 +48,6 @@
     "lodash": "^4.17.21",
     "luxon": "^3.4.3",
     "new-find-package-json": "^2.0.0",
-    "node-fetch": "^2.7.0",
     "pretty-ms": "^8.0.0",
     "shell-quote": "^1.8.1",
     "typescript": "^5.2.2"
