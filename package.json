@@ -40,7 +40,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@golem-sdk/golem-js": "^0.12.3",
+    "@golem-sdk/golem-js": "^0.13.1",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "commander": "^11.1.0",
