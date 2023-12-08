@@ -10,21 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@golem-sdk/golem-js": "^1.0.0",
+    "@golem-sdk/golem-js": "^1.0.1",
     "@golem-sdk/react": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.39",
+    "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "@vitejs/plugin-react": "^4.2.0",
-    "eslint": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.4",
-    "typescript": "^5.3.2",
-    "vite": "^4.5.0"
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.3.3",
+    "vite": "^4.5.1"
   }
 }
