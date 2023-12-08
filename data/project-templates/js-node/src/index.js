@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const { LogLevel, ProposalFilters, TaskExecutor } = require("@golem-sdk/golem-js");
+const { LogLevel, TaskExecutor, ProposalFilters } = require("@golem-sdk/golem-js");
 
 dotenv.config();
 
@@ -10,6 +10,8 @@ dotenv.config();
 
     // How much you wish to spend
     budget: 0.5,
+
+    // How do you want to select market proposals
     proposalFilter: ProposalFilters.limitPriceFilter({
       start: 0.1,
       cpuPerSec: 0.1 / 3600,
@@ -36,6 +38,6 @@ dotenv.config();
   } catch (err) {
     console.error("Running the task on Golem failed due to", err);
   } finally {
-    await executor.end();
+    await executor.shutdown();
   }
 })();
