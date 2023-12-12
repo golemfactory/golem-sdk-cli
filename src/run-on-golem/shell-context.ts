@@ -34,7 +34,7 @@ export class TaskAPIContext implements ProgramContext {
               resolve();
             }),
           {
-            maxRetries: -1, // FIXME: Let's fix that already in the SDK!!!
+            maxRetries: 0,
           },
         )
         .then(() => {
