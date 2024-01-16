@@ -3,7 +3,7 @@ import { createInterface } from "readline/promises";
 import { parse, ParseEntry } from "shell-quote";
 import { CommanderError } from "commander";
 import { ParseError, ShellError } from "./errors";
-import { EventType, ExecutorOptions, TaskExecutor } from "@golem-sdk/golem-js";
+import { EVENT_TYPE, ExecutorOptions, TaskExecutor } from "@golem-sdk/golem-js";
 import { assertFileExists, checkFileExists } from "../lib/file";
 import { readFile } from "fs/promises";
 import { TaskAPIContext, VarsType } from "./shell-context";
@@ -241,7 +241,7 @@ function installSignalHandlers(context: TaskAPIContext, et: EventTarget) {
 
   // This is used to detect if the activity was terminated by the provider, error or timeout.
   // If it is, TaskExecutor is already shutting down. Make sure we terminate the shell.
-  et.addEventListener(EventType, async (e) => {
+  et.addEventListener(EVENT_TYPE, async (e) => {
     // FIXME: Will be fixed after JST-526
     if (e instanceof Events.ActivityDestroyed) {
       // // This will happen on activity timeout
