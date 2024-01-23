@@ -1,4 +1,4 @@
-export interface PaymentOptions {
+export interface InvoiceSearchOptions {
   yagnaAppkey: string;
   after: Date;
   limit: number;
@@ -6,11 +6,14 @@ export interface PaymentOptions {
   wallet?: string[];
   minAmount?: number;
   maxAmount?: number;
+  paymentPlatform?: string[];
   columns: string[];
   status: string[];
   invoice?: string[];
   format: "table" | "json" | "csv";
-  pay: boolean;
+}
+
+export interface InvoiceAcceptOptions extends InvoiceSearchOptions {
   yes: boolean;
   dryRun: boolean;
   silent: boolean;
