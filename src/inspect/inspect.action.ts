@@ -52,7 +52,8 @@ export async function inspectAction(type: string, id: string, options: InspectOp
   try {
     await yagna.connect();
   } catch (err) {
-    console.log(chalk.red(`Cannot connect to Yagna, check the app-key and URL`));
+    console.log(chalk.red(`Cannot connect to Yagna, check the app-key and URL\n`));
+    console.log(chalk.red(`${err}`));
     process.exitCode = 1;
     return;
   }
@@ -61,7 +62,8 @@ export async function inspectAction(type: string, id: string, options: InspectOp
       const activity = await getActivityDetails(yagna, id);
       printSelectedColumns(activity, options.columns);
     } catch (err) {
-      console.log(chalk.red(`Cannot get activity details, are you sure the activity ID is correct?`));
+      console.log(chalk.red(`Cannot get activity details, are you sure the activity ID is correct?\n`));
+      console.log(chalk.red(`${err}`));
       process.exitCode = 1;
       return;
     }
@@ -71,7 +73,8 @@ export async function inspectAction(type: string, id: string, options: InspectOp
       const agreement = await getAgreementDetails(yagna, id);
       printSelectedColumns(agreement, options.columns);
     } catch (err) {
-      console.log(chalk.red(`Cannot get agreement details, are you sure the agreement ID is correct?`));
+      console.log(chalk.red(`Cannot get agreement details, are you sure the agreement ID is correct?\n`));
+      console.log(chalk.red(`${err}`));
       process.exitCode = 1;
       return;
     }
@@ -82,8 +85,9 @@ export async function inspectAction(type: string, id: string, options: InspectOp
       printSelectedColumns(demand, options.columns);
     } catch (err) {
       console.log(
-        chalk.red(`Cannot get demand details, are you sure the demand ID is correct and the demand is still active?`),
+        chalk.red(`Cannot get demand details, are you sure the demand ID is correct and the demand is still active?\n`),
       );
+      console.log(chalk.red(`${err}`));
       process.exitCode = 1;
       return;
     }

@@ -14,7 +14,7 @@ $ golem-sdk inspect -k yagna-appkey activity 0x1234 --columns currentState agree
   .argument("<id>", "ID of the object to inspect.")
   .option(
     "-c, --columns [columns...]",
-    "Columns to include in the output. For nested columns, use dot notation, e.g. 'agreement.agreementId'. Pass * to include all columns.",
+    "Columns to include in the output. For nested columns, use dot notation, e.g. 'agreement.agreementId'. Pass \"*\" to include all columns.",
     ["*"],
   )
   .action(async (type, id, options) => {
