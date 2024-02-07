@@ -53,7 +53,7 @@ export class TaskAPIContext implements ProgramContext {
       this.workResolve();
     }
 
-    await this.executor.end();
+    await this.executor.shutdown();
     this.terminated = true;
   }
 }
