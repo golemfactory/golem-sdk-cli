@@ -76,5 +76,9 @@
   },
   "workspaces": [
     "data/project-templates/*"
+  ],
+  "files": [
+    "dist",
+    "data"
   ]
 }
