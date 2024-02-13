@@ -43,7 +43,7 @@
     "@golem-sdk/golem-js": "^2.0.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
-    "chalk": "^4.1.2",
+    "chalk": "4.1.2",
     "commander": "^12.0.0",
     "console-table-printer": "^2.12.0",
     "decimal.js-light": "^2.5.1",
