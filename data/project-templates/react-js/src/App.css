@@ -27,8 +27,15 @@
 }
 
 .installation-instructions {
-  max-width: 32em;
+  max-width: 48em;
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.connect-button {
+  align-self: flex-end;
 }
 
 .node-version-check-wrapper {
