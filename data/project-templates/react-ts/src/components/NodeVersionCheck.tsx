@@ -1,5 +1,5 @@
 import { useExecutor } from "@golem-sdk/react";
-import { LogLevel, ProposalFilters } from "@golem-sdk/golem-js";
+import { ProposalFilterFactory } from "@golem-sdk/golem-js";
 import { NodeVersionCheckTask } from "./NodeVersionCheckTask";
 
 export function NodeVersionCheck() {
@@ -11,7 +11,7 @@ export function NodeVersionCheck() {
     budget: 0.5,
 
     // How do you want to select market proposals
-    proposalFilter: ProposalFilters.limitPriceFilter({
+    proposalFilter: ProposalFilterFactory.limitPriceFilter({
       start: 0.1,
       cpuPerSec: 0.1 / 3600,
       envPerSec: 0.1 / 3600,
@@ -24,9 +24,6 @@ export function NodeVersionCheck() {
 
     // Control the execution of tasks
     maxTaskRetries: 0,
-
-    // Useful for debugging
-    logLevel: LogLevel.Info,
     taskTimeout: 5 * 60 * 1000,
   });
 

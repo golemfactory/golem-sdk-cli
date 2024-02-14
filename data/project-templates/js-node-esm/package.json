@@ -16,10 +16,10 @@
     "application"
   ],
   "dependencies": {
-    "@golem-sdk/golem-js": "^1.0.1",
-    "dotenv": "^16.3.1"
+    "@golem-sdk/golem-js": "^2.0.0",
+    "dotenv": "^16.4.3"
   },
   "devDependencies": {
-    "@golem-sdk/cli": "^2.0.1"
+    "@golem-sdk/cli": "^2.1.1"
   }
 }

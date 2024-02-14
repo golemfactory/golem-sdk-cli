@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const { LogLevel, TaskExecutor, ProposalFilters } = require("@golem-sdk/golem-js");
+const { pinoLogger, TaskExecutor, ProposalFilterFactory } = require("@golem-sdk/golem-js");
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ dotenv.config();
     budget: 0.5,
 
     // How do you want to select market proposals
-    proposalFilter: ProposalFilters.limitPriceFilter({
+    proposalFilter: ProposalFilterFactory.limitPriceFilter({
       start: 0.1,
       cpuPerSec: 0.1 / 3600,
       envPerSec: 0.1 / 3600,
@@ -27,7 +27,7 @@ dotenv.config();
     maxTaskRetries: 0,
 
     // Useful for debugging
-    logLevel: LogLevel.Info,
+    logger: pinoLogger({ level: "info" }),
     taskTimeout: 5 * 60 * 1000,
   });
 
