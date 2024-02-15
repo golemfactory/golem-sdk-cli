@@ -129,8 +129,10 @@ marketCommand
     await marketService.run(workload, allocation);
 
     setTimeout(async () => {
-      console.log("Scan finished, here are the results");
-      console.log("Your market query was matched with %d proposals", proposals.length);
+      if (!options.silent) {
+        console.log("Scan finished, here are the results");
+        console.log("Your market query was matched with %d proposals", proposals.length);
+      }
 
       const displayProposals = proposals.map((p) => {
         return {
