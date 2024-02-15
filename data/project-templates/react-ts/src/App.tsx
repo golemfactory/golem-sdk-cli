@@ -4,6 +4,7 @@ import viteLogo from "./assets/vite.svg";
 import "./App.css";
 import { useYagna } from "@golem-sdk/react";
 import { NodeVersionCheck } from "./components/NodeVersionCheck";
+import { ConnectToYagna } from "./components/ConnectToYagna";
 
 function App() {
   const { isConnected } = useYagna();
@@ -11,33 +12,19 @@ function App() {
   return (
     <>
       <div>
-        <a href="https://docs.golem.network" target="_blank">
+        <a href="https://docs.golem.network" target="_blank" rel="noreferrer">
           <img src={golemLogo} className="logo" alt="Golem logo" />
         </a>
-        <a href="https://vitejs.dev" target="_blank">
+        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
+        <a href="https://react.dev" target="_blank" rel="noreferrer">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
       <h1>Golem + Vite + React</h1>
       <h2>Yagna is {isConnected ? "connected" : "not connected"}</h2>
-      {!isConnected && (
-        <p className="installation-instructions">
-          Looks like yagna is not running on your local machine. Please follow the instructions in the{" "}
-          <a
-            className="link"
-            target="_blank"
-            href="https://docs.golem.network/docs/creators/javascript/examples/tools/yagna-installation-for-requestors"
-          >
-            quickstart
-          </a>
-          . Make sure to start the process with the <code>--api-allow-origin</code> flag:
-          <br />
-          <code>{`yagna service run --api-allow-origin='${window.location.origin}'`}</code>
-        </p>
-      )}
+      {!isConnected && <ConnectToYagna />}
       <div className="card">{isConnected && <NodeVersionCheck />}</div>
       <div className="card">
         <p>

@@ -189,29 +189,14 @@ export async function newAction(providedName: string, options: NewOptions) {
 
   installDependencies(options, projectPath);
 
-  const isReactProject = template.startsWith("react");
-  if (isReactProject) {
-    const envFile = join(projectPath, ".env");
-    try {
-      await writeFile(envFile, `VITE_YAGNA_APPKEY=${process.env.YAGNA_APPKEY || ""}`);
-    } catch (e) {
-      console.error(`Error: Failed to write ${envFile}: ${e}`);
-      process.exit(1);
-    }
-  }
-
   console.log(`Project created successfully in ${projectPath}.`);
 
-  if (!process.env.YAGNA_APPKEY) {
-    if (isReactProject) {
-      console.log(
-        "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. To successfully run your new React application, you will need to define the VITE_YAGNA_APPKEY environment variable in your .env file.",
-      );
-    } else {
-      console.log(
-        "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. You will need to define it or provide a .env file with it to run your new application.",
-      );
-    }
+  // react templates don't read the app key from env
+  const isReactProject = template.startsWith("react");
+  if (!process.env.YAGNA_APPKEY && !isReactProject) {
+    console.log(
+      "NOTE: You do not seem to have YAGNA_APPKEY environment variable defined. You will need to define it or provide a .env file with it to run your new application.",
+    );
   }
 
   // TODO: Show some next steps, or pull it from template directory.
