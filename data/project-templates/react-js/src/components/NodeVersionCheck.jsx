@@ -19,7 +19,7 @@ export function NodeVersionCheck() {
 
     // Where you want to spend
     payment: {
-      network: "polygon",
+      network: "goerli",
     },
 
     // Control the execution of tasks
