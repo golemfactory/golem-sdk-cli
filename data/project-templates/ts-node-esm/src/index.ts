@@ -9,13 +9,13 @@ dotenv.config();
     package: "golem/node:20-alpine",
 
     // How much you wish to spend
-    budget: 0.5,
+    budget: 2,
 
     // How do you want to select market proposals
     proposalFilter: ProposalFilterFactory.limitPriceFilter({
-      start: 0.1,
-      cpuPerSec: 0.1 / 3600,
-      envPerSec: 0.1 / 3600,
+      start: 1,
+      cpuPerSec: 1 / 3600,
+      envPerSec: 1 / 3600,
     }),
 
     // Where you want to spend
@@ -28,7 +28,7 @@ dotenv.config();
 
     // Useful for debugging
     logger: pinoLogger({
-      level: "info",
+      level: "debug",
     }),
     taskTimeout: 5 * 60 * 1000,
   });
