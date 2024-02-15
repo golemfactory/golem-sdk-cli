@@ -13,9 +13,9 @@ dotenv.config();
 
     // How do you want to select market proposals
     proposalFilter: ProposalFilterFactory.limitPriceFilter({
-      start: 1,
-      cpuPerSec: 1 / 3600,
-      envPerSec: 1 / 3600,
+      start: 1.0,
+      cpuPerSec: 1.0 / 3600,
+      envPerSec: 1.0 / 3600,
     }),
 
     // Where you want to spend
@@ -28,7 +28,7 @@ dotenv.config();
 
     // Useful for debugging
     logger: pinoLogger({
-      level: "debug",
+      level: "info",
     }),
     taskTimeout: 5 * 60 * 1000,
   });
