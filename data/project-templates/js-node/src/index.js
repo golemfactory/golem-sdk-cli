@@ -9,18 +9,18 @@ dotenv.config();
     package: "golem/node:20-alpine",
 
     // How much you wish to spend
-    budget: 0.5,
+    budget: 2,
 
     // How do you want to select market proposals
     proposalFilter: ProposalFilterFactory.limitPriceFilter({
-      start: 0.1,
-      cpuPerSec: 0.1 / 3600,
-      envPerSec: 0.1 / 3600,
+      start: 1.0,
+      cpuPerSec: 1.0 / 3600,
+      envPerSec: 1.0 / 3600,
     }),
 
     // Where you want to spend
     payment: {
-      network: "polygon",
+      network: "goerli",
     },
 
     // Control the execution of tasks
