@@ -31,6 +31,8 @@ marketCommand
   .option("--max-start-price <sp>", "The max start price you're willing to pay (in GLM)", "10")
   .option("--max-cpu-per-hour-price <sp>", "The max ENV price you're willing to pay (in GLM)", "10")
   .option("--max-env-per-hour-price <sp>", "The max CPU time price you're willing to pay (in GLM/h)", "10")
+  .option("--engine <type>", "The runtime that you are interested in", "vm")
+  .option("--capabilities [capabilities...]", "List of capabilities listed in the offers")
   .option("-o, --output <type>", "Controls how to present the results (table, json)", "table")
   .option("-s, --silent", "Controls if verbose output should be presented")
   .action(async (options) => {
@@ -50,6 +52,8 @@ marketCommand
     const minCpuThreads = parseInt(options.minCpuThreads);
     const minMemGib = parseFloat(options.minMemGib);
     const minStorageGib = parseFloat(options.minStorageGib);
+    const engine = options.engine;
+    const capabilities = options.capabilities;
 
     if (!options.silent) {
       console.log("Querying Golem Network for proposals matching your criteria");
@@ -57,6 +61,8 @@ marketCommand
       console.log("Scan time: %d seconds", scanTime);
       console.log("Golem Network subnet tag:", subnetTag);
       console.log("Payment network and driver:", paymentNetwork, paymentDriver);
+      console.log("Golem engine:", engine);
+      console.log("Provider capabilities:", capabilities);
       console.log(
         "Requirements for image '%s', %d cores, %d threads, %dGiB of memory, %dGiB of storage",
         imageTag,
@@ -119,6 +125,8 @@ marketCommand
       minCpuThreads: minCpuThreads,
       minMemGib: minMemGib,
       minStorageGib: minStorageGib,
+      capabilities,
+      engine,
     });
 
     const allocation = await paymentService.createAllocation({
