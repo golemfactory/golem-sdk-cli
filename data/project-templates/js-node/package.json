@@ -15,7 +15,8 @@
     "application"
   ],
   "dependencies": {
-    "@golem-sdk/golem-js": "^2.0.0",
+    "@golem-sdk/golem-js": "^2.2.0",
+    "@golem-sdk/task-executor": "^1.0.1",
     "dotenv": "^16.4.3"
   },
   "devDependencies": {
