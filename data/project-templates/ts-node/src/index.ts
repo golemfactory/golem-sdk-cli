@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
-import { pinoLogger, ProposalFilterFactory, TaskExecutor } from "@golem-sdk/golem-js";
+import { ProposalFilterFactory, TaskExecutor } from "@golem-sdk/task-executor";
+import { pinoLogger } from "@golem-sdk/golem-js";
 
 dotenv.config();
 

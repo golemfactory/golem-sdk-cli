@@ -3,7 +3,7 @@ import { createInterface } from "readline/promises";
 import { parse, ParseEntry } from "shell-quote";
 import { CommanderError } from "commander";
 import { ParseError, ShellError } from "./errors";
-import { EVENT_TYPE, ExecutorOptions, TaskExecutor } from "@golem-sdk/golem-js";
+import { ExecutorOptions, TaskExecutor, TaskExecutorEventsDict } from "@golem-sdk/task-executor";
 import { assertFileExists, checkFileExists } from "../lib/file";
 import { readFile } from "fs/promises";
 import { TaskAPIContext, VarsType } from "./shell-context";
@@ -11,6 +11,7 @@ import * as fs from "fs";
 import * as readline from "readline";
 import { Events } from "@golem-sdk/golem-js";
 import { shellProgram } from "./shell-program";
+import { EventEmitter } from "eventemitter3";
 
 enum OutputMode {
   APPEND = 1,
@@ -181,12 +182,11 @@ function execConsole(context: TaskAPIContext): Promise<void> {
   });
 }
 
-async function createExecutor(options: RunOnGolemOptions, et: EventTarget) {
+async function createExecutor(options: RunOnGolemOptions) {
   const timeout = options.timeout ? parseInt(options.timeout, 10) : 60 * 60;
   const opts: ExecutorOptions = {
     taskTimeout: 1000 * timeout,
     skipProcessSignals: true,
-    eventTarget: et,
   };
 
   if (options.image) {
@@ -215,7 +215,7 @@ async function createExecutor(options: RunOnGolemOptions, et: EventTarget) {
   return TaskExecutor.create(opts);
 }
 
-function installSignalHandlers(context: TaskAPIContext, et: EventTarget) {
+function installSignalHandlers(context: TaskAPIContext, events: EventEmitter<TaskExecutorEventsDict>) {
   const signals = ["SIGINT", "SIGTERM", "SIGBREAK"];
   let terminating = false;
 
@@ -241,27 +241,28 @@ function installSignalHandlers(context: TaskAPIContext, et: EventTarget) {
 
   // This is used to detect if the activity was terminated by the provider, error or timeout.
   // If it is, TaskExecutor is already shutting down. Make sure we terminate the shell.
-  et.addEventListener(EVENT_TYPE, async (e) => {
-    // FIXME: Will be fixed after JST-526
+  events.on("golemEvents", async (e) => {
     if (e instanceof Events.ActivityDestroyed) {
-      // // This will happen on activity timeout
-      // if (terminating || context.exited) return;
-      // terminating = true;
-      // console.log("Activity destroyed, terminating shell...");
-      //
-      // await context.terminate();
-      //
-      // process.exit(0);
-    } else if (e instanceof Events.ComputationFailed) {
-      // This will happen on activity timeout and when executor times out waiting for offers
+      // This will happen on activity timeout
       if (terminating || context.exited) return;
       terminating = true;
-      console.log("Terminating shell...");
+      console.log("Activity destroyed, terminating shell...");
 
       await context.terminate();
 
       process.exit(0);
     }
+  });
+
+  events.on("taskFailed", async () => {
+    // This will happen on activity timeout and when executor times out waiting for offers
+    if (terminating || context.exited) return;
+    terminating = true;
+    console.log("Terminating shell...");
+
+    await context.terminate();
+
+    process.exit(0);
   });
 }
 
@@ -272,10 +273,9 @@ export async function runOnGolemAction(files: string[], options: RunOnGolemOptio
   };
 
   // Create task executor.
-  const et = new EventTarget();
-  const executor = await createExecutor(options, et);
+  const executor = await createExecutor(options);
   const context = new TaskAPIContext(executor, vars);
-  installSignalHandlers(context, et);
+  installSignalHandlers(context, executor.events);
 
   try {
     // Do magic so we have a work context.

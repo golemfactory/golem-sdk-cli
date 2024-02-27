@@ -1,5 +1,4 @@
-import { TaskExecutor } from "@golem-sdk/golem-js";
-import { WorkContext } from "@golem-sdk/golem-js/dist/task";
+import { TaskExecutor, WorkContext } from "@golem-sdk/task-executor";
 import { ProgramContext } from "./context-interface";
 
 export type VarsType = { [key: string]: string | undefined };
