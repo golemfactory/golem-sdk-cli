@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const { TaskExecutor, ProposalFilterFactory } = require("@golem-sdk/task-executor");
-const { pinoLogger } = require("@golem-sdk/golem-js")
+const { pinoLogger } = require("@golem-sdk/golem-js");
 
 dotenv.config();
 

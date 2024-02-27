@@ -186,7 +186,7 @@ async function createExecutor(options: RunOnGolemOptions) {
   const timeout = options.timeout ? parseInt(options.timeout, 10) : 60 * 60;
   const opts: ExecutorOptions = {
     taskTimeout: 1000 * timeout,
-    skipProcessSignals: true
+    skipProcessSignals: true,
   };
 
   if (options.image) {
@@ -263,7 +263,7 @@ function installSignalHandlers(context: TaskAPIContext, events: EventEmitter<Tas
     await context.terminate();
 
     process.exit(0);
-  })
+  });
 }
 
 export async function runOnGolemAction(files: string[], options: RunOnGolemOptions) {
