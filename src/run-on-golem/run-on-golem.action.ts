@@ -254,7 +254,7 @@ function installSignalHandlers(context: TaskAPIContext, events: EventEmitter<Tas
     }
   });
 
-  events.on("taskFailed", async (e) => {
+  events.on("taskFailed", async () => {
     // This will happen on activity timeout and when executor times out waiting for offers
     if (terminating || context.exited) return;
     terminating = true;
