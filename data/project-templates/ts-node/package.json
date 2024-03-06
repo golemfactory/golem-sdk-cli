@@ -2,6 +2,7 @@
   "name": "ts-node-golem-app",
   "version": "1.0.0",
   "description": "NodeJS script using Golem Network",
+  "type": "commonjs",
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
