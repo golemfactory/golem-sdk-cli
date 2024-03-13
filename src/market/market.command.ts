@@ -102,7 +102,11 @@ marketCommand
     try {
       await yagna.connect();
     } catch (e) {
-      console.error(chalk.red("Failed to connect to Yagna, check if Yagna is running and the --yagna-url and --yagna-appkey are correct"));
+      console.error(
+        chalk.red(
+          "Failed to connect to Yagna, check if Yagna is running and the --yagna-url and --yagna-appkey are correct",
+        ),
+      );
       process.exitCode = 1;
       return;
     }
