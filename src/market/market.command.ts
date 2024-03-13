@@ -8,6 +8,7 @@ import {
   ProposalFilterFactory,
   Yagna,
 } from "@golem-sdk/golem-js";
+import chalk from "chalk";
 
 export const marketCommand = new Command("market");
 
@@ -19,6 +20,7 @@ marketCommand
   .command("scan")
   .description("Runs a scan of the market with your criteria and presents results")
   .addOption(new Option("-k, --yagna-appkey <key>", "Yagna app key to use").env("YAGNA_APPKEY").makeOptionMandatory())
+  .option("--yagna-url <url>", "Yagna API URL", "http://127.0.0.1:7465")
   .option("-t, --scan-time <sec>", "Number of seconds to scan the market", "30")
   .option("--payment-network <name>", "The payment network to use", "polygon")
   .option("--payment-driver <name>", "The payment driver to use", "erc20")
@@ -33,6 +35,15 @@ marketCommand
   .option("--max-env-per-hour-price <sp>", "The max CPU time price you're willing to pay (in GLM/h)", "10")
   .option("--engine <type>", "The runtime that you are interested in", "vm")
   .option("--capabilities [capabilities...]", "List of capabilities listed in the offers")
+  .option("--provider-id [id...]", "Filter the results to only include proposals from providers with the given ids")
+  .option(
+    "--provider-name [name...]",
+    "Filter the results to only include proposals from providers with the given names",
+  )
+  .option(
+    "--provider-wallet [wallet...]",
+    "Filter the results to only include proposals from providers with the given wallet addresses",
+  )
   .option("-o, --output <type>", "Controls how to present the results (table, json)", "table")
   .option("-s, --silent", "Controls if verbose output should be presented")
   .action(async (options) => {
@@ -54,6 +65,10 @@ marketCommand
     const minStorageGib = parseFloat(options.minStorageGib);
     const engine = options.engine;
     const capabilities = options.capabilities;
+    const providerIdFilter = (id: string) => (options.providerId ? options.providerId.includes(id) : true);
+    const providerNameFilter = (name: string) => (options.providerName ? options.providerName.includes(name) : true);
+    const providerWalletFilter = (wallet: string) =>
+      options.providerWallet ? options.providerWallet.includes(wallet) : true;
 
     if (!options.silent) {
       console.log("Querying Golem Network for proposals matching your criteria");
@@ -81,10 +96,16 @@ marketCommand
 
     const yagna = new Yagna({
       apiKey: options.yagnaAppkey,
-      basePath: "http://localhost:7465",
+      basePath: options.yagnaUrl,
     });
 
-    await yagna.connect();
+    try {
+      await yagna.connect();
+    } catch (e) {
+      console.error(chalk.red("Failed to connect to Yagna, check if Yagna is running and the --yagna-url and --yagna-appkey are correct"));
+      process.exitCode = 1;
+      return;
+    }
     const api = yagna.getApi();
 
     const paymentService = new PaymentService(api, {
@@ -106,7 +127,11 @@ marketCommand
 
     const scanningFilter = (p: Proposal) => {
       const withinPriceRange = priceLimiter(p);
-      if (withinPriceRange) {
+      const isValidProviderId = providerIdFilter(p.provider.id);
+      const isValidProviderName = providerNameFilter(p.provider.name);
+      const isValidProviderWallet = providerWalletFilter(p.provider.walletAddress);
+
+      if (withinPriceRange && isValidProviderId && isValidProviderName && isValidProviderWallet) {
         proposals.push(p);
       }
       // Do not negotiate with anyone
