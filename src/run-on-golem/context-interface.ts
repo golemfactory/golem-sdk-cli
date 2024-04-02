@@ -1,4 +1,4 @@
-import { WorkContext } from "@golem-sdk/golem-js/dist/task";
+import { WorkContext } from "@golem-sdk/golem-js";
 
 export interface ProgramContext {
   exited: boolean;
