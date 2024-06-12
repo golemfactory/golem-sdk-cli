@@ -92,4 +92,5 @@ export async function inspectAction(type: string, id: string, options: InspectOp
       return;
     }
   }
+  await glm.disconnect();
 }
