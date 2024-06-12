@@ -14,6 +14,7 @@ runOnGolemCommand
   .option("-i, --interactive", "Force interactive mode, even if commands or batch files are provided.")
   .option("-n, --no-env", "Do not include environment variables into the shell.")
   .option("-t, --timeout <timeout>", "Timeout for the activity in seconds. Default: 3600 (1h).", "3600")
+  .option("-p, --price <price>", "Maximum price per hour for the activity. Default: 1.0 GLM.", "1.0")
   .argument("[file...]", "Batch files to execute, exit after execution.")
   .addHelpText(
     "after",

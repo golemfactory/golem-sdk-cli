@@ -5,4 +5,5 @@ export interface RunOnGolemOptions {
   env?: boolean; // commander.js skips `no` in options names.
   timeout: string;
   interactive?: boolean;
+  price?: string;
 }

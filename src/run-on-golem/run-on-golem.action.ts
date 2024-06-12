@@ -183,12 +183,11 @@ function execConsole(lease: LeaseProcess, processContext: ProcessContext): Promi
 async function createMarketOrder(options: RunOnGolemOptions): Promise<MarketOrderSpec> {
   const timeout = options.timeout ? parseInt(options.timeout, 10) : 60 * 60;
 
-  // TODO: remove hardcoded
   const market: MarketOrderSpec["market"] = {
-    rentHours: 1,
+    rentHours: timeout / 3600,
     pricing: {
       model: "burn-rate",
-      avgGlmPerHour: 1,
+      avgGlmPerHour: options.price ? parseFloat(options.price) : 1.0,
     },
   };
 
