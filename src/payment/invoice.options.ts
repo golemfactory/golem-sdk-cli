@@ -1,5 +1,6 @@
 export interface InvoiceSearchOptions {
   yagnaAppkey: string;
+  url: string;
   after: Date;
   limit: number;
   provider?: string[];

@@ -48,7 +48,7 @@ export async function acceptAction(options: InvoiceAcceptOptions) {
   const glm = new GolemNetwork({
     api: {
       key: options.yagnaAppkey,
-      // TODO: Add URL to the options
+      url: options.url,
     },
   });
   const paymentProcessor = glm.payment.createInvoiceProcessor();
