@@ -41,7 +41,6 @@
   },
   "dependencies": {
     "@golem-sdk/golem-js": "^3.0.0-beta.43",
-    "@golem-sdk/task-executor": "^1.0.1",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "chalk": "4.1.2",
@@ -54,8 +53,7 @@
     "new-find-package-json": "^2.0.0",
     "pretty-ms": "^9.0.0",
     "shell-quote": "^1.8.1",
-    "typescript": "^5.3.3",
-    "ya-ts-client": "^1.1.1"
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.3",
