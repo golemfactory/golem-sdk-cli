@@ -116,6 +116,11 @@ marketCommand
         key: options.yagnaAppkey,
         url: options.yagnaUrl,
       },
+      payment: {
+        // TODO: bug in golem-js https://github.com/golemfactory/golem-js/pull/973
+        driver: paymentDriver as "erc20",
+        network: paymentNetwork,
+      },
     });
 
     try {
