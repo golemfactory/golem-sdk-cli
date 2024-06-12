@@ -1,13 +1,13 @@
-import { InvoiceProcessor } from "@golem-sdk/golem-js";
-import { Invoice } from "ya-ts-client/dist/ya-payment";
+import { GolemNetwork } from "@golem-sdk/golem-js";
+import { PaymentApi } from "ya-ts-client";
 import { Table } from "console-table-printer";
 import { InvoiceSearchOptions } from "./invoice.options";
 import _ from "lodash";
 import chalk from "chalk";
 import { fetchInvoices } from "./common";
 
-function printRows(invoices: Invoice[], options: InvoiceSearchOptions) {
-  const getRow = (invoice: Invoice) => {
+function printRows(invoices: PaymentApi.InvoiceDTO[], options: InvoiceSearchOptions) {
+  const getRow = (invoice: PaymentApi.InvoiceDTO) => {
     const allColumns = {
       id: invoice.invoiceId,
       status: invoice.status,
@@ -55,10 +55,14 @@ function printRows(invoices: Invoice[], options: InvoiceSearchOptions) {
 }
 
 export async function searchAction(options: InvoiceSearchOptions) {
-  const paymentProcessor = await InvoiceProcessor.create({
-    apiKey: options.yagnaAppkey,
+  const glm = new GolemNetwork({
+    api: {
+      key: options.yagnaAppkey,
+      // TODO: Add URL to the options
+    },
   });
-  let invoices: Invoice[];
+  const paymentProcessor = glm.payment.createInvoiceProcessor();
+  let invoices: PaymentApi.InvoiceDTO[];
   try {
     invoices = await fetchInvoices(options, paymentProcessor);
   } catch {

@@ -1,14 +1,14 @@
 import { prompt } from "enquirer";
 import Decimal from "decimal.js-light";
 import { Table } from "console-table-printer";
-import { Invoice } from "ya-ts-client/dist/ya-payment";
+import { PaymentApi } from "ya-ts-client";
 import chalk from "chalk";
 import { InvoiceAcceptOptions } from "./invoice.options";
-import { InvoiceAcceptResult, InvoiceProcessor } from "@golem-sdk/golem-js";
+import { GolemNetwork, InvoiceAcceptResult } from "@golem-sdk/golem-js";
 import { fetchInvoices } from "./common";
 import _ from "lodash";
 
-async function askForConfirmation(invoices: Invoice[], columns: InvoiceAcceptOptions["columns"]) {
+async function askForConfirmation(invoices: PaymentApi.InvoiceDTO[], columns: InvoiceAcceptOptions["columns"]) {
   const invoicesToPay = [];
 
   let i = 0;
@@ -45,10 +45,14 @@ async function askForConfirmation(invoices: Invoice[], columns: InvoiceAcceptOpt
 }
 
 export async function acceptAction(options: InvoiceAcceptOptions) {
-  const paymentProcessor = await InvoiceProcessor.create({
-    apiKey: options.yagnaAppkey,
+  const glm = new GolemNetwork({
+    api: {
+      key: options.yagnaAppkey,
+      // TODO: Add URL to the options
+    },
   });
-  let invoices: Invoice[];
+  const paymentProcessor = glm.payment.createInvoiceProcessor();
+  let invoices: PaymentApi.InvoiceDTO[];
   try {
     invoices = await fetchInvoices(options, paymentProcessor);
   } catch (e) {
