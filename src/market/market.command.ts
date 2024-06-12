@@ -9,6 +9,30 @@ marketCommand.description("Commands providing insights from the market");
 
 const unifyPrice = (price: number) => parseFloat(price.toFixed(4));
 
+type MarketScanOptions = {
+  yagnaAppkey: string;
+  yagnaUrl: string;
+  scanTime: string;
+  paymentNetwork: string;
+  paymentDriver: string;
+  subnetTag: string;
+  image: string;
+  minCpuCores: string;
+  minCpuThreads: string;
+  minMemGib: string;
+  minStorageGib: string;
+  maxStartPrice: string;
+  maxCpuPerHourPrice: string;
+  maxEnvPerHourPrice: string;
+  engine: string;
+  capabilities: string[];
+  providerId?: string[];
+  providerName?: string[];
+  providerWallet?: string[];
+  output: "table" | "json";
+  silent: boolean;
+};
+
 marketCommand
   .command("scan")
   .description("Runs a scan of the market with your criteria and presents results")
@@ -27,7 +51,7 @@ marketCommand
   .option("--max-cpu-per-hour-price <sp>", "The max ENV price you're willing to pay (in GLM)", "10")
   .option("--max-env-per-hour-price <sp>", "The max CPU time price you're willing to pay (in GLM/h)", "10")
   .option("--engine <type>", "The runtime that you are interested in", "vm")
-  .option("--capabilities [capabilities...]", "List of capabilities listed in the offers")
+  .option("--capabilities [capabilities...]", "List of capabilities listed in the offers", [])
   .option("--provider-id [id...]", "Filter the results to only include proposals from providers with the given ids")
   .option(
     "--provider-name [name...]",
@@ -38,8 +62,8 @@ marketCommand
     "Filter the results to only include proposals from providers with the given wallet addresses",
   )
   .option("-o, --output <type>", "Controls how to present the results (table, json)", "table")
-  .option("-s, --silent", "Controls if verbose output should be presented")
-  .action(async (options) => {
+  .option("-s, --silent", "Controls if verbose output should be presented", false)
+  .action(async (options: MarketScanOptions) => {
     const scanTime = parseInt(options.scanTime);
 
     const paymentNetwork = options.paymentNetwork;
