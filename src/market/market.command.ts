@@ -1,20 +1,37 @@
 import { Command, Option } from "commander";
-import {
-  AgreementPoolService,
-  MarketService,
-  Package,
-  PaymentService,
-  Proposal,
-  ProposalFilterFactory,
-  Yagna,
-} from "@golem-sdk/golem-js";
+import { GolemNetwork, MarketOrderSpec, OfferProposal, ProposalFilterFactory } from "@golem-sdk/golem-js";
 import chalk from "chalk";
+import { switchMap, filter, scan, takeUntil, timer, last } from "rxjs";
 
 export const marketCommand = new Command("market");
 
 marketCommand.description("Commands providing insights from the market");
 
 const unifyPrice = (price: number) => parseFloat(price.toFixed(4));
+
+type MarketScanOptions = {
+  yagnaAppkey: string;
+  yagnaUrl: string;
+  scanTime: string;
+  paymentNetwork: string;
+  paymentDriver: string;
+  subnetTag: string;
+  image: string;
+  minCpuCores: string;
+  minCpuThreads: string;
+  minMemGib: string;
+  minStorageGib: string;
+  maxStartPrice: string;
+  maxCpuPerHourPrice: string;
+  maxEnvPerHourPrice: string;
+  engine: string;
+  capabilities: string[];
+  providerId?: string[];
+  providerName?: string[];
+  providerWallet?: string[];
+  output: "table" | "json";
+  silent: boolean;
+};
 
 marketCommand
   .command("scan")
@@ -34,7 +51,7 @@ marketCommand
   .option("--max-cpu-per-hour-price <sp>", "The max ENV price you're willing to pay (in GLM)", "10")
   .option("--max-env-per-hour-price <sp>", "The max CPU time price you're willing to pay (in GLM/h)", "10")
   .option("--engine <type>", "The runtime that you are interested in", "vm")
-  .option("--capabilities [capabilities...]", "List of capabilities listed in the offers")
+  .option("--capabilities [capabilities...]", "List of capabilities listed in the offers", [])
   .option("--provider-id [id...]", "Filter the results to only include proposals from providers with the given ids")
   .option(
     "--provider-name [name...]",
@@ -45,8 +62,8 @@ marketCommand
     "Filter the results to only include proposals from providers with the given wallet addresses",
   )
   .option("-o, --output <type>", "Controls how to present the results (table, json)", "table")
-  .option("-s, --silent", "Controls if verbose output should be presented")
-  .action(async (options) => {
+  .option("-s, --silent", "Controls if verbose output should be presented", false)
+  .action(async (options: MarketScanOptions) => {
     const scanTime = parseInt(options.scanTime);
 
     const paymentNetwork = options.paymentNetwork;
@@ -94,13 +111,19 @@ marketCommand
       );
     }
 
-    const yagna = new Yagna({
-      apiKey: options.yagnaAppkey,
-      basePath: options.yagnaUrl,
+    const glm = new GolemNetwork({
+      api: {
+        key: options.yagnaAppkey,
+        url: options.yagnaUrl,
+      },
+      payment: {
+        driver: paymentDriver,
+        network: paymentNetwork,
+      },
     });
 
     try {
-      await yagna.connect();
+      await glm.connect();
     } catch (e) {
       console.error(
         chalk.red(
@@ -110,18 +133,6 @@ marketCommand
       process.exitCode = 1;
       return;
     }
-    const api = yagna.getApi();
-
-    const paymentService = new PaymentService(api, {
-      payment: {
-        network: paymentNetwork,
-        driver: paymentDriver,
-      },
-    });
-
-    const agreementService = new AgreementPoolService(api);
-
-    const proposals: Proposal[] = [];
 
     const priceLimiter = ProposalFilterFactory.limitPriceFilter({
       start: maxStartPrice,
@@ -129,72 +140,103 @@ marketCommand
       envPerSec: maxEnvPerHourPrice / 3600,
     });
 
-    const scanningFilter = (p: Proposal) => {
+    const scanningFilter = (p: OfferProposal) => {
       const withinPriceRange = priceLimiter(p);
       const isValidProviderId = providerIdFilter(p.provider.id);
       const isValidProviderName = providerNameFilter(p.provider.name);
       const isValidProviderWallet = providerWalletFilter(p.provider.walletAddress);
 
-      if (withinPriceRange && isValidProviderId && isValidProviderName && isValidProviderWallet) {
-        proposals.push(p);
-      }
-      // Do not negotiate with anyone
-      return false;
+      return withinPriceRange && isValidProviderId && isValidProviderName && isValidProviderWallet;
     };
 
-    const marketService = new MarketService(agreementService, api, {
-      subnetTag: subnetTag,
-      expirationSec: scanTime,
-      proposalFilter: scanningFilter,
-    });
+    const order: MarketOrderSpec = {
+      demand: {
+        subnetTag,
+        expirationSec: scanTime,
+        workload: {
+          imageTag,
+          minCpuCores,
+          minCpuThreads,
+          minMemGib,
+          minStorageGib,
+          capabilities,
+          engine,
+        },
+      },
+      market: {
+        rentHours: scanTime / 3600,
+        pricing: {
+          model: "linear",
+          maxCpuPerHourPrice,
+          maxEnvPerHourPrice,
+          maxStartPrice,
+        },
+        proposalFilter: scanningFilter,
+      },
+    };
 
-    const workload = Package.create({
-      imageTag: imageTag,
-      minCpuCores: minCpuCores,
-      minCpuThreads: minCpuThreads,
-      minMemGib: minMemGib,
-      minStorageGib: minStorageGib,
-      capabilities,
-      engine,
-    });
-
-    const allocation = await paymentService.createAllocation({
+    const allocation = await glm.payment.createAllocation({
       budget: 0,
       expirationSec: scanTime,
     });
+    const demandSpec = await glm.market.buildDemandDetails(order.demand, allocation);
 
-    await marketService.run(workload, allocation);
+    glm.market
+      .publishAndRefreshDemand(demandSpec)
+      .pipe(
+        switchMap((demand) => glm.market.collectAllOfferProposals(demand)),
+        filter(scanningFilter),
+        scan((acc, proposal) => {
+          acc.push(proposal);
+          return acc;
+        }, [] as OfferProposal[]),
+        takeUntil(timer(scanTime * 1000)),
+        last(),
+      )
+      .subscribe({
+        next: (proposals) => {
+          if (!options.silent) {
+            console.log("Scan finished, here are the results");
+            console.log("Your market query was matched with %d proposals", proposals.length);
+          }
 
-    setTimeout(async () => {
-      if (!options.silent) {
-        console.log("Scan finished, here are the results");
-        console.log("Your market query was matched with %d proposals", proposals.length);
-      }
+          const displayProposals = proposals.map((p) => {
+            const memory = p.getDto()["memory"];
+            const storage = p.getDto()["storage"];
+            return {
+              providerId: p.provider.id,
+              providerName: p.provider.name,
+              startPrice: unifyPrice(p.pricing.start),
+              cpuPerHourPrice: unifyPrice(p.pricing.cpuSec * 3600),
+              envPerHourPrice: unifyPrice(p.pricing.envSec * 3600),
+              cpuCores: p.getDto()["cpuCores"],
+              cpuThreads: p.getDto()["cpuThreads"],
+              memoryGib: memory ? parseFloat(memory.toFixed(1)) : "N/A",
+              storageGib: storage ? parseFloat(storage.toFixed(1)) : "N/A",
+            };
+          });
 
-      const displayProposals = proposals.map((p) => {
-        return {
-          providerId: p.provider.id,
-          providerName: p.provider.name,
-          startPrice: unifyPrice(p.pricing.start),
-          cpuPerHourPrice: unifyPrice(p.pricing.cpuSec * 3600),
-          envPerHourPrice: unifyPrice(p.pricing.envSec * 3600),
-          cpuCores: p.details["cpuCores"],
-          cpuThreads: p.details["cpuThreads"],
-          memoryGib: parseFloat(p.details["memory"].toFixed(1)),
-          storageGib: parseFloat(p.details["storage"].toFixed(1)),
-        };
+          switch (options.output) {
+            case "json":
+              console.log(JSON.stringify(displayProposals));
+              break;
+            case "table":
+            default:
+              console.table(displayProposals);
+              break;
+          }
+        },
+        complete: () => {
+          if (!options.silent) {
+            console.log("Scan completed, disconnecting from the network...");
+          }
+          void glm.disconnect();
+        },
+        error: (e) => {
+          if (!options.silent) {
+            console.error(chalk.red("An error occurred during the scan"), e);
+          }
+          void glm.disconnect();
+        },
       });
-
-      switch (options.output) {
-        case "json":
-          console.log(JSON.stringify(displayProposals));
-          break;
-        case "table":
-        default:
-          console.table(displayProposals);
-          break;
-      }
-
-      await marketService.end();
-    }, scanTime * 1000);
   });

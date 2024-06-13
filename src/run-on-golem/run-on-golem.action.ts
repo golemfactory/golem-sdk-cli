@@ -3,15 +3,13 @@ import { createInterface } from "readline/promises";
 import { parse, ParseEntry } from "shell-quote";
 import { CommanderError } from "commander";
 import { ParseError, ShellError } from "./errors";
-import { ExecutorOptions, TaskExecutor, TaskExecutorEventsDict } from "@golem-sdk/task-executor";
 import { assertFileExists, checkFileExists } from "../lib/file";
 import { readFile } from "fs/promises";
-import { TaskAPIContext, VarsType } from "./shell-context";
+import { ProcessEnvVars, ProcessContext } from "./shell-context";
 import * as fs from "fs";
 import * as readline from "readline";
-import { Events } from "@golem-sdk/golem-js";
+import { GolemNetwork, LeaseProcess, MarketOrderSpec } from "@golem-sdk/golem-js";
 import { shellProgram } from "./shell-program";
-import { EventEmitter } from "eventemitter3";
 
 enum OutputMode {
   APPEND = 1,
@@ -79,11 +77,11 @@ function parseTokens(tokens: ParseEntry[]): ParseResult[] {
   return results;
 }
 
-async function execCommand(context: TaskAPIContext, cmd: ParseResult) {
+async function execCommand(lease: LeaseProcess, context: ProcessContext, cmd: ParseResult) {
   try {
     // Cannot call parse()/parseAsync() multiple times on the same command object, due to an ignored bug:
     // https://github.com/tj/commander.js/issues/841
-    const program = shellProgram(context);
+    const program = shellProgram(lease, context);
     await program.parseAsync(cmd.arguments, { from: "user" });
   } catch (e) {
     if (e instanceof ShellError) {
@@ -107,8 +105,8 @@ function handleHelp(line: string): ParseEntry[] | undefined {
   return undefined;
 }
 
-async function execLine(context: TaskAPIContext, line: string) {
-  const tokens = handleHelp(line) ?? parse(line, context.vars);
+async function execLine(lease: LeaseProcess, processContext: ProcessContext, line: string) {
+  const tokens = handleHelp(line) ?? parse(line, processContext.env);
   let commands: ParseResult[];
   try {
     commands = parseTokens(tokens);
@@ -122,14 +120,14 @@ async function execLine(context: TaskAPIContext, line: string) {
   }
 
   for (const cmd of commands) {
-    await execCommand(context, cmd);
-    if (context.exited) {
+    await execCommand(lease, processContext, cmd);
+    if (processContext.metadata.terminating) {
       return;
     }
   }
 }
 
-async function execFile(context: TaskAPIContext, file: string): Promise<void> {
+async function execFile(lease: LeaseProcess, context: ProcessContext, file: string): Promise<void> {
   await assertFileExists("Script file", file);
   const lines: string[] = [];
 
@@ -152,11 +150,11 @@ async function execFile(context: TaskAPIContext, file: string): Promise<void> {
   });
 
   for (const line of lines) {
-    await execLine(context, line);
+    await execLine(lease, context, line);
   }
 }
 
-function execConsole(context: TaskAPIContext): Promise<void> {
+function execConsole(lease: LeaseProcess, processContext: ProcessContext): Promise<void> {
   console.log("Type ? for help, exit to end the session.");
   return new Promise<void>((resolve, reject) => {
     const rl = createInterface({
@@ -168,9 +166,9 @@ function execConsole(context: TaskAPIContext): Promise<void> {
     rl.prompt();
     rl.on("line", (line) => {
       rl.pause();
-      execLine(context, line)
+      execLine(lease, processContext, line)
         .then(() => {
-          if (context.exited) {
+          if (processContext.metadata.terminating) {
             rl.close();
             resolve();
           } else {
@@ -182,40 +180,56 @@ function execConsole(context: TaskAPIContext): Promise<void> {
   });
 }
 
-async function createExecutor(options: RunOnGolemOptions) {
+async function createMarketOrder(options: RunOnGolemOptions): Promise<MarketOrderSpec> {
   const timeout = options.timeout ? parseInt(options.timeout, 10) : 60 * 60;
-  const opts: ExecutorOptions = {
-    taskTimeout: 1000 * timeout,
-    skipProcessSignals: true,
+
+  const market: MarketOrderSpec["market"] = {
+    rentHours: timeout / 3600,
+    pricing: {
+      model: "burn-rate",
+      avgGlmPerHour: options.price ? parseFloat(options.price) : 1.0,
+    },
   };
 
   if (options.image) {
-    console.log(`Creating executor using image ${options.image}`);
-    opts.package = options.image;
-  } else {
-    console.log(`Creating task executor using manifest file ${options.manifest}`);
-    if (!(await checkFileExists("Manifest file", options.manifest))) {
-      console.log("You can create a manifest file by running:\n\n\tgolem-sdk manifest create\n");
-      console.log(
-        "You can specify a manifest file to use by using the --manifest option:" +
-          "\n\n\tgolem-sdk run-on-golem --manifest <manifest>\n",
-      );
-      console.log(
-        "If you want to use an image directly instead of a manifest file, use the --image option:" +
-          "\n\n\tgolem-sdk run-on-golem --image <image>\n",
-      );
-      process.exit(1);
-    }
-
-    // TODO: add option for signed manifests.
-    opts.manifest = (await readFile(options.manifest)).toString("base64");
-    opts.capabilities = ["manifest-support"];
+    console.log(`Publishing order using image ${options.image}`);
+    return {
+      demand: {
+        expirationSec: timeout,
+        workload: {
+          imageTag: options.image,
+        },
+      },
+      market,
+    };
+  }
+  console.log(`Publishing order using manifest file ${options.manifest}`);
+  if (!(await checkFileExists("Manifest file", options.manifest))) {
+    console.log("You can create a manifest file by running:\n\n\tgolem-sdk manifest create\n");
+    console.log(
+      "You can specify a manifest file to use by using the --manifest option:" +
+        "\n\n\tgolem-sdk run-on-golem --manifest <manifest>\n",
+    );
+    console.log(
+      "If you want to use an image directly instead of a manifest file, use the --image option:" +
+        "\n\n\tgolem-sdk run-on-golem --image <image>\n",
+    );
+    process.exit(1);
   }
 
-  return TaskExecutor.create(opts);
+  // TODO: add option for signed manifests.
+  return {
+    demand: {
+      workload: {
+        manifest: (await readFile(options.manifest)).toString("base64"),
+        capabilities: ["manifest-support"],
+      },
+    },
+    market,
+  };
 }
 
-function installSignalHandlers(context: TaskAPIContext, events: EventEmitter<TaskExecutorEventsDict>) {
+function installSignalHandlers(lease: LeaseProcess, glm: GolemNetwork, context: ProcessContext) {
   const signals = ["SIGINT", "SIGTERM", "SIGBREAK"];
   let terminating = false;
 
@@ -226,10 +240,7 @@ function installSignalHandlers(context: TaskAPIContext, events: EventEmitter<Tas
 
     console.log(`${signal} received, terminating shell...`);
 
-    // Terminate the context.
-    if (!context.terminated) {
-      await context.terminate();
-    }
+    await lease.finalize();
 
     // Exit shell.
     process.exit(0);
@@ -241,26 +252,13 @@ function installSignalHandlers(context: TaskAPIContext, events: EventEmitter<Tas
 
   // This is used to detect if the activity was terminated by the provider, error or timeout.
   // If it is, TaskExecutor is already shutting down. Make sure we terminate the shell.
-  events.on("golemEvents", async (e) => {
-    if (e instanceof Events.ActivityDestroyed) {
-      // This will happen on activity timeout
-      if (terminating || context.exited) return;
-      terminating = true;
-      console.log("Activity destroyed, terminating shell...");
-
-      await context.terminate();
-
-      process.exit(0);
-    }
-  });
-
-  events.on("taskFailed", async () => {
-    // This will happen on activity timeout and when executor times out waiting for offers
-    if (terminating || context.exited) return;
+  glm.activity.events.on("activityDestroyed", async () => {
+    // This will happen on activity timeout
+    if (terminating || context.metadata.terminating) return;
     terminating = true;
-    console.log("Terminating shell...");
+    console.log("Activity destroyed, terminating shell...");
 
-    await context.terminate();
+    await lease.finalize();
 
     process.exit(0);
   });
@@ -268,37 +266,48 @@ function installSignalHandlers(context: TaskAPIContext, events: EventEmitter<Tas
 
 export async function runOnGolemAction(files: string[], options: RunOnGolemOptions) {
   // Prepare shell variables.
-  const vars: VarsType = {
+  const env: ProcessEnvVars = {
     ...(options.env ? process.env : {}),
   };
-
-  // Create task executor.
-  const executor = await createExecutor(options);
-  const context = new TaskAPIContext(executor, vars);
-  installSignalHandlers(context, executor.events);
+  const metadata = {
+    activityStart: new Date(),
+    terminating: false,
+  };
+  const context: ProcessContext = {
+    env,
+    metadata,
+  };
+  const glm = new GolemNetwork();
+  await glm.connect();
 
   try {
-    // Do magic so we have a work context.
-    await context.magic();
+    const order = await createMarketOrder(options);
+    const lease = await glm.oneOf(order);
+    // force deploy activity on the provider
+    await lease.getExeUnit();
+    context.metadata.activityStart = new Date();
+
+    // Install process signal handlers.
+    installSignalHandlers(lease, glm, context);
 
     // Execute files.
     for (const file of files) {
-      await execFile(context, file);
+      await execFile(lease, context, file);
     }
 
     // Execute commands from CLI
     if (options.execute) {
-      await execLine(context, options.execute);
+      await execLine(lease, context, options.execute);
     }
 
     // Go to interactive shell if working in interactive mode.
     if ((!options.execute && !files.length) || options.interactive) {
-      await execConsole(context);
+      await execConsole(lease, context);
     }
   } catch (e) {
     console.error(e);
   } finally {
-    console.log("Terminating task executor...");
-    await context.terminate();
+    console.log("Disconnecting from Golem Network...");
+    await glm.disconnect();
   }
 }

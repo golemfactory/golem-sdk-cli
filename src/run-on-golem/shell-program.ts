@@ -1,11 +1,12 @@
 import { Command } from "commander";
-import { ProgramContext } from "./context-interface";
 import { checkDirExists, checkFileExists } from "../lib/file";
 import path from "node:path";
 import { DateTime } from "luxon";
 import { writeFile } from "fs/promises";
+import { LeaseProcess } from "@golem-sdk/golem-js";
+import { ProcessContext } from "./shell-context";
 
-export function shellProgram(pContext: ProgramContext): Command {
+export function shellProgram(lease: LeaseProcess, processContext: ProcessContext): Command {
   const program = new Command("shell");
   program
     .exitOverride()
@@ -46,7 +47,7 @@ export function shellProgram(pContext: ProgramContext): Command {
     .showHelpAfterError("Type `exit --help` form more information.")
     .helpOption(true)
     .action(() => {
-      pContext.exited = true;
+      void lease.finalize();
     });
 
   program
@@ -71,13 +72,13 @@ export function shellProgram(pContext: ProgramContext): Command {
 
       if (!name) {
         // Display all variables.
-        for (const [key, value] of Object.entries(pContext.vars)) {
+        for (const [key, value] of Object.entries(processContext.env)) {
           console.log(`${key}=${value ?? ""}`);
         }
       } else if (parts?.length === 1) {
-        console.log(`${parts[0]}=${pContext.vars[parts[0]] ?? ""}`);
+        console.log(`${parts[0]}=${processContext.env[parts[0]] ?? ""}`);
       } else {
-        pContext.vars[parts![0]] = parts![1];
+        processContext.env[parts![0]] = parts![1];
       }
     });
 
@@ -92,7 +93,7 @@ export function shellProgram(pContext: ProgramContext): Command {
     .showHelpAfterError("Type `run --help` form more information.")
     .helpOption(true)
     .action(async (command: string, options) => {
-      const result = await pContext.workContext.run(command);
+      const result = await lease.getExeUnit().then((exe) => exe.run(command));
       if (result.result !== "Ok") {
         console.error(`Command error: ${result.message}`);
       }
@@ -161,7 +162,7 @@ export function shellProgram(pContext: ProgramContext): Command {
       }
 
       console.log(`Uploading ${sourceFile}...`);
-      const result = await pContext.workContext.uploadFile(sourceFile, destinationFile);
+      const result = await lease.getExeUnit().then((exe) => exe.uploadFile(sourceFile, destinationFile));
       if (result.result === "Ok") {
         console.log("File uploaded.");
       } else {
@@ -190,7 +191,7 @@ export function shellProgram(pContext: ProgramContext): Command {
       }
 
       console.log(`Downloading ${sourceFile}...`);
-      const result = await pContext.workContext.downloadFile(sourceFile, destinationPath);
+      const result = await lease.getExeUnit().then((exe) => exe.downloadFile(sourceFile, destinationPath));
       if (result.result === "Ok") {
         console.log("File downloaded.");
       } else {
@@ -205,7 +206,7 @@ export function shellProgram(pContext: ProgramContext): Command {
     .showHelpAfterError("Type `time --help` form more information.")
     .helpOption(true)
     .action(async () => {
-      const start = pContext.startDate;
+      const start = processContext.metadata.activityStart;
       const now = Date.now();
       const duration = now - start.getTime();
       const prettyMs = await import("pretty-ms"); // ESM vs CJS nightmare...
