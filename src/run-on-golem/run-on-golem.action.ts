@@ -8,7 +8,7 @@ import { readFile } from "fs/promises";
 import { ProcessEnvVars, ProcessContext } from "./shell-context";
 import * as fs from "fs";
 import * as readline from "readline";
-import { GolemNetwork, LeaseProcess, MarketOrderSpec } from "@golem-sdk/golem-js";
+import { GolemNetwork, ResourceRental, MarketOrderSpec } from "@golem-sdk/golem-js";
 import { shellProgram } from "./shell-program";
 
 enum OutputMode {
@@ -77,11 +77,11 @@ function parseTokens(tokens: ParseEntry[]): ParseResult[] {
   return results;
 }
 
-async function execCommand(lease: LeaseProcess, context: ProcessContext, cmd: ParseResult) {
+async function execCommand(rental: ResourceRental, context: ProcessContext, cmd: ParseResult) {
   try {
     // Cannot call parse()/parseAsync() multiple times on the same command object, due to an ignored bug:
     // https://github.com/tj/commander.js/issues/841
-    const program = shellProgram(lease, context);
+    const program = shellProgram(rental, context);
     await program.parseAsync(cmd.arguments, { from: "user" });
   } catch (e) {
     if (e instanceof ShellError) {
@@ -105,7 +105,7 @@ function handleHelp(line: string): ParseEntry[] | undefined {
   return undefined;
 }
 
-async function execLine(lease: LeaseProcess, processContext: ProcessContext, line: string) {
+async function execLine(rental: ResourceRental, processContext: ProcessContext, line: string) {
   const tokens = handleHelp(line) ?? parse(line, processContext.env);
   let commands: ParseResult[];
   try {
@@ -120,14 +120,14 @@ async function execLine(lease: LeaseProcess, processContext: ProcessContext, lin
   }
 
   for (const cmd of commands) {
-    await execCommand(lease, processContext, cmd);
+    await execCommand(rental, processContext, cmd);
     if (processContext.metadata.terminating) {
       return;
     }
   }
 }
 
-async function execFile(lease: LeaseProcess, context: ProcessContext, file: string): Promise<void> {
+async function execFile(rental: ResourceRental, context: ProcessContext, file: string): Promise<void> {
   await assertFileExists("Script file", file);
   const lines: string[] = [];
 
@@ -150,11 +150,11 @@ async function execFile(lease: LeaseProcess, context: ProcessContext, file: stri
   });
 
   for (const line of lines) {
-    await execLine(lease, context, line);
+    await execLine(rental, context, line);
   }
 }
 
-function execConsole(lease: LeaseProcess, processContext: ProcessContext): Promise<void> {
+function execConsole(rental: ResourceRental, processContext: ProcessContext): Promise<void> {
   console.log("Type ? for help, exit to end the session.");
   return new Promise<void>((resolve, reject) => {
     const rl = createInterface({
@@ -166,7 +166,7 @@ function execConsole(lease: LeaseProcess, processContext: ProcessContext): Promi
     rl.prompt();
     rl.on("line", (line) => {
       rl.pause();
-      execLine(lease, processContext, line)
+      execLine(rental, processContext, line)
         .then(() => {
           if (processContext.metadata.terminating) {
             rl.close();
@@ -229,7 +229,7 @@ async function createMarketOrder(options: RunOnGolemOptions): Promise<MarketOrde
   };
 }
 
-function installSignalHandlers(lease: LeaseProcess, glm: GolemNetwork, context: ProcessContext) {
+function installSignalHandlers(rental: ResourceRental, glm: GolemNetwork, context: ProcessContext) {
   const signals = ["SIGINT", "SIGTERM", "SIGBREAK"];
   let terminating = false;
 
@@ -240,7 +240,7 @@ function installSignalHandlers(lease: LeaseProcess, glm: GolemNetwork, context: 
 
     console.log(`${signal} received, terminating shell...`);
 
-    await lease.finalize();
+    await rental.stopAndFinalize();
 
     // Exit shell.
     process.exit(0);
@@ -258,7 +258,7 @@ function installSignalHandlers(lease: LeaseProcess, glm: GolemNetwork, context: 
     terminating = true;
     console.log("Activity destroyed, terminating shell...");
 
-    await lease.finalize();
+    await rental.stopAndFinalize();
 
     process.exit(0);
   });
@@ -282,7 +282,7 @@ export async function runOnGolemAction(files: string[], options: RunOnGolemOptio
 
   try {
     const order = await createMarketOrder(options);
-    const lease = await glm.oneOf(order);
+    const lease = await glm.oneOf({ order });
     // force deploy activity on the provider
     await lease.getExeUnit();
     context.metadata.activityStart = new Date();
