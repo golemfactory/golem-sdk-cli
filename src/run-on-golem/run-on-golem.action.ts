@@ -282,27 +282,27 @@ export async function runOnGolemAction(files: string[], options: RunOnGolemOptio
 
   try {
     const order = await createMarketOrder(options);
-    const lease = await glm.oneOf({ order });
+    const rental = await glm.oneOf({ order });
     // force deploy activity on the provider
-    await lease.getExeUnit();
+    await rental.getExeUnit();
     context.metadata.activityStart = new Date();
 
     // Install process signal handlers.
-    installSignalHandlers(lease, glm, context);
+    installSignalHandlers(rental, glm, context);
 
     // Execute files.
     for (const file of files) {
-      await execFile(lease, context, file);
+      await execFile(rental, context, file);
     }
 
     // Execute commands from CLI
     if (options.execute) {
-      await execLine(lease, context, options.execute);
+      await execLine(rental, context, options.execute);
     }
 
     // Go to interactive shell if working in interactive mode.
     if ((!options.execute && !files.length) || options.interactive) {
-      await execConsole(lease, context);
+      await execConsole(rental, context);
     }
   } catch (e) {
     console.error(e);
