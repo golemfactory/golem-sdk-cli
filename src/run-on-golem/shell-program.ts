@@ -3,10 +3,10 @@ import { checkDirExists, checkFileExists } from "../lib/file";
 import path from "node:path";
 import { DateTime } from "luxon";
 import { writeFile } from "fs/promises";
-import { LeaseProcess } from "@golem-sdk/golem-js";
+import { ResourceRental } from "@golem-sdk/golem-js";
 import { ProcessContext } from "./shell-context";
 
-export function shellProgram(lease: LeaseProcess, processContext: ProcessContext): Command {
+export function shellProgram(rental: ResourceRental, processContext: ProcessContext): Command {
   const program = new Command("shell");
   program
     .exitOverride()
@@ -47,7 +47,7 @@ export function shellProgram(lease: LeaseProcess, processContext: ProcessContext
     .showHelpAfterError("Type `exit --help` form more information.")
     .helpOption(true)
     .action(() => {
-      void lease.finalize();
+      void rental.stopAndFinalize();
     });
 
   program
@@ -93,7 +93,7 @@ export function shellProgram(lease: LeaseProcess, processContext: ProcessContext
     .showHelpAfterError("Type `run --help` form more information.")
     .helpOption(true)
     .action(async (command: string, options) => {
-      const result = await lease.getExeUnit().then((exe) => exe.run(command));
+      const result = await rental.getExeUnit().then((exe) => exe.run(command));
       if (result.result !== "Ok") {
         console.error(`Command error: ${result.message}`);
       }
@@ -162,7 +162,7 @@ export function shellProgram(lease: LeaseProcess, processContext: ProcessContext
       }
 
       console.log(`Uploading ${sourceFile}...`);
-      const result = await lease.getExeUnit().then((exe) => exe.uploadFile(sourceFile, destinationFile));
+      const result = await rental.getExeUnit().then((exe) => exe.uploadFile(sourceFile, destinationFile));
       if (result.result === "Ok") {
         console.log("File uploaded.");
       } else {
@@ -191,7 +191,7 @@ export function shellProgram(lease: LeaseProcess, processContext: ProcessContext
       }
 
       console.log(`Downloading ${sourceFile}...`);
-      const result = await lease.getExeUnit().then((exe) => exe.downloadFile(sourceFile, destinationPath));
+      const result = await rental.getExeUnit().then((exe) => exe.downloadFile(sourceFile, destinationPath));
       if (result.result === "Ok") {
         console.log("File downloaded.");
       } else {

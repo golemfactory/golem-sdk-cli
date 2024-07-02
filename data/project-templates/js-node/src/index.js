@@ -6,8 +6,8 @@ const order = {
     workload: { imageTag: "golem/alpine:latest" },
   },
   market: {
-    // 5 minutes
-    rentHours: 5 / 60,
+    // 15 minutes
+    rentHours: 15 / 60,
     pricing: {
       model: "linear",
       maxStartPrice: 0.5,
@@ -22,26 +22,27 @@ const order = {
 
   try {
     await glm.connect();
-    // create a pool that can grow up to 3 leases at the same time
+    // create a pool that can grow up to 3 rentals at the same time
     const pool = await glm.manyOf({
-      concurrency: 3,
+      poolSize: 3,
       order,
     });
+    console.log("Starting work on Golem!");
     await Promise.allSettled([
-      pool.withLease(async (lease) =>
-        lease
+      pool.withRental(async (rental) =>
+        rental
           .getExeUnit()
           .then((exe) => exe.run("echo Hello, Golem from the first machine! 👋"))
           .then((res) => console.log(res.stdout)),
       ),
-      pool.withLease(async (lease) =>
-        lease
+      pool.withRental(async (rental) =>
+        rental
           .getExeUnit()
           .then((exe) => exe.run("echo Hello, Golem from the second machine! 👋"))
           .then((res) => console.log(res.stdout)),
       ),
-      pool.withLease(async (lease) =>
-        lease
+      pool.withRental(async (rental) =>
+        rental
           .getExeUnit()
           .then((exe) => exe.run("echo Hello, Golem from the third machine! 👋"))
           .then((res) => console.log(res.stdout)),
