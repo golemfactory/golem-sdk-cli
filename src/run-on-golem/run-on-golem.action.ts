@@ -195,7 +195,6 @@ async function createMarketOrder(options: RunOnGolemOptions): Promise<MarketOrde
     console.log(`Publishing order using image ${options.image}`);
     return {
       demand: {
-        expirationSec: timeout,
         workload: {
           imageTag: options.image,
         },

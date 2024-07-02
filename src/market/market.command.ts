@@ -1,5 +1,5 @@
 import { Command, Option } from "commander";
-import { GolemNetwork, MarketOrderSpec, OfferProposal, ProposalFilterFactory } from "@golem-sdk/golem-js";
+import { GolemNetwork, MarketOrderSpec, OfferProposal, OfferProposalFilterFactory } from "@golem-sdk/golem-js";
 import chalk from "chalk";
 import { switchMap, filter, scan, takeUntil, timer, last } from "rxjs";
 
@@ -134,7 +134,7 @@ marketCommand
       return;
     }
 
-    const priceLimiter = ProposalFilterFactory.limitPriceFilter({
+    const priceLimiter = OfferProposalFilterFactory.limitPriceFilter({
       start: maxStartPrice,
       cpuPerSec: maxCpuPerHourPrice / 3600,
       envPerSec: maxEnvPerHourPrice / 3600,
@@ -152,7 +152,6 @@ marketCommand
     const order: MarketOrderSpec = {
       demand: {
         subnetTag,
-        expirationSec: scanTime,
         workload: {
           imageTag,
           minCpuCores,
@@ -171,7 +170,7 @@ marketCommand
           maxEnvPerHourPrice,
           maxStartPrice,
         },
-        proposalFilter: scanningFilter,
+        offerProposalFilter: scanningFilter,
       },
     };
 
@@ -179,7 +178,7 @@ marketCommand
       budget: 0,
       expirationSec: scanTime,
     });
-    const demandSpec = await glm.market.buildDemandDetails(order.demand, allocation);
+    const demandSpec = await glm.market.buildDemandDetails(order.demand, order.market, allocation);
 
     glm.market
       .publishAndRefreshDemand(demandSpec)
