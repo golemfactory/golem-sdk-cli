@@ -1,6 +1,7 @@
 import { Command, InvalidArgumentError, Option } from "commander";
 import { InvoiceSearchOptions } from "./invoice.options";
 import { InvoiceProcessor } from "@golem-sdk/golem-js";
+import { PaymentApi } from "ya-ts-client";
 
 function parseIntOrThrow(value: string) {
   const parsedValue = parseInt(value, 10);
@@ -20,6 +21,9 @@ function parseDateOrThrow(value: string) {
 export function createInvoiceCommand(name: string): Command {
   return new Command(name)
     .addOption(new Option("-k, --yagna-appkey <key>", "Yagna app key").env("YAGNA_APPKEY").makeOptionMandatory())
+    .addOption(
+      new Option("--url <url>", "Yagna url (including port)").env("YAGNA_API_URL").default("http://127.0.0.1:7465"),
+    )
     .addOption(
       new Option("--after <after>", "Search for invoices after this date")
         .default(new Date(0))
@@ -52,7 +56,10 @@ export function createInvoiceCommand(name: string): Command {
     .option("-f, --format <format>", "Output format: table, json, csv.", "table");
 }
 
-export async function fetchInvoices(options: InvoiceSearchOptions, processor: InvoiceProcessor) {
+export async function fetchInvoices(
+  options: InvoiceSearchOptions,
+  processor: InvoiceProcessor,
+): Promise<PaymentApi.InvoiceDTO[]> {
   if (options.invoice && options.invoice.length > 0) {
     return Promise.all(options.invoice.map(async (invoiceId) => processor.fetchSingleInvoice(invoiceId)));
   }

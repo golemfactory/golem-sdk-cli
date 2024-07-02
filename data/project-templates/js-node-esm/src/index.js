@@ -1,44 +1,56 @@
-import * as dotenv from "dotenv";
-import { ProposalFilterFactory, TaskExecutor } from "@golem-sdk/task-executor";
-import { pinoLogger } from "@golem-sdk/golem-js";
+import "dotenv/config";
+import { GolemNetwork } from "@golem-sdk/golem-js";
 
-dotenv.config();
-
-(async function main() {
-  const executor = await TaskExecutor.create({
-    // What do you want to run
-    package: "golem/node:20-alpine",
-
-    // How much you wish to spend
-    budget: 2,
-
-    // How do you want to select market proposals
-    proposalFilter: ProposalFilterFactory.limitPriceFilter({
-      start: 1.0,
-      cpuPerSec: 1.0 / 3600,
-      envPerSec: 1.0 / 3600,
-    }),
-
-    // Where you want to spend
-    payment: {
-      network: "goerli",
+const order = {
+  demand: {
+    workload: { imageTag: "golem/alpine:latest" },
+  },
+  market: {
+    // 15 minutes
+    rentHours: 15 / 60,
+    pricing: {
+      model: "linear",
+      maxStartPrice: 0.5,
+      maxCpuPerHourPrice: 1.0,
+      maxEnvPerHourPrice: 0.5,
     },
+  },
+};
 
-    // Control the execution of tasks
-    maxTaskRetries: 0,
-
-    // Useful for debugging
-    logger: pinoLogger({ level: "info" }),
-    taskTimeout: 5 * 60 * 1000,
-  });
+(async () => {
+  const glm = new GolemNetwork();
 
   try {
-    // Your code goes here
-    const result = await executor.run((ctx) => ctx.run("node -v"));
-    console.log("Version of NodeJS on Provider:", result.stdout.trim());
+    await glm.connect();
+    // create a pool that can grow up to 3 rentals at the same time
+    const pool = await glm.manyOf({
+      poolSize: 3,
+      order,
+    });
+    console.log("Starting work on Golem!");
+    await Promise.allSettled([
+      pool.withRental(async (rental) =>
+        rental
+          .getExeUnit()
+          .then((exe) => exe.run("echo Hello, Golem from the first machine! 👋"))
+          .then((res) => console.log(res.stdout)),
+      ),
+      pool.withRental(async (rental) =>
+        rental
+          .getExeUnit()
+          .then((exe) => exe.run("echo Hello, Golem from the second machine! 👋"))
+          .then((res) => console.log(res.stdout)),
+      ),
+      pool.withRental(async (rental) =>
+        rental
+          .getExeUnit()
+          .then((exe) => exe.run("echo Hello, Golem from the third machine! 👋"))
+          .then((res) => console.log(res.stdout)),
+      ),
+    ]);
   } catch (err) {
-    console.error("Running the task on Golem failed due to", err);
+    console.error("Something went wrong:", err);
   } finally {
-    await executor.shutdown();
+    await glm.disconnect();
   }
-})();
+})().catch(console.error);

@@ -1,11 +1,11 @@
-import { Yagna } from "@golem-sdk/golem-js";
+import { GolemNetwork } from "@golem-sdk/golem-js";
 import { InspectOptions } from "./inspect.options";
 import chalk from "chalk";
 import _ from "lodash";
 
-async function getDemandDetails(yagna: Yagna, demandId: string) {
-  const api = yagna.getApi().market;
-  const { data: activeDemands } = await api.getDemands();
+async function getDemandDetails(glm: GolemNetwork, demandId: string) {
+  const api = glm.services.yagna.market;
+  const activeDemands = await api.getDemands();
   const demandDetails = activeDemands.find((demand) => demand.demandId === demandId);
   if (!demandDetails) {
     throw new Error("Demand not found");
@@ -13,25 +13,23 @@ async function getDemandDetails(yagna: Yagna, demandId: string) {
   return demandDetails;
 }
 
-async function getAgreementDetails(yagna: Yagna, agreementId: string) {
-  const api = yagna.getApi().market;
-  const { data: agreementDetails } = await api.getAgreement(agreementId);
+async function getAgreementDetails(glm: GolemNetwork, agreementId: string) {
+  const api = glm.services.yagna.market;
+  const agreementDetails = await api.getAgreement(agreementId);
   // agreementDetails already has demand details included
   return agreementDetails;
 }
 
-async function getActivityDetails(yagna: Yagna, activityId: string) {
-  const api = yagna.getApi().activity.state;
-  const {
-    data: { state },
-  } = await api.getActivityState(activityId);
-  const { data: usage } = await api.getActivityUsage(activityId);
-  const agreementId = await api.getActivityAgreementId(activityId);
+async function getActivityDetails(glm: GolemNetwork, activityId: string) {
+  const api = glm.services.yagna.activity.state;
+  const { state } = await api.getActivityState(activityId);
+  const usage = await api.getActivityUsage(activityId);
+  const agreementId = await api.getActivityAgreement(activityId);
   return {
     currentState: state[0],
     nextState: state[1],
     usage,
-    agreement: await getAgreementDetails(yagna, agreementId),
+    agreement: await getAgreementDetails(glm, agreementId),
   };
 }
 
@@ -45,12 +43,14 @@ function printSelectedColumns(obj: object, columns: string[]) {
 }
 
 export async function inspectAction(type: string, id: string, options: InspectOptions) {
-  const yagna = new Yagna({
-    apiKey: options.yagnaAppkey,
-    basePath: options.yagnaUrl,
+  const glm = new GolemNetwork({
+    api: {
+      url: options.yagnaUrl,
+      key: options.yagnaAppkey,
+    },
   });
   try {
-    await yagna.connect();
+    await glm.connect();
   } catch (err) {
     console.log(chalk.red(`Cannot connect to Yagna, check the app-key and URL\n`));
     console.log(chalk.red(`${err}`));
@@ -59,7 +59,7 @@ export async function inspectAction(type: string, id: string, options: InspectOp
   }
   if (type === "activity") {
     try {
-      const activity = await getActivityDetails(yagna, id);
+      const activity = await getActivityDetails(glm, id);
       printSelectedColumns(activity, options.columns);
     } catch (err) {
       console.log(chalk.red(`Cannot get activity details, are you sure the activity ID is correct?\n`));
@@ -70,7 +70,7 @@ export async function inspectAction(type: string, id: string, options: InspectOp
   }
   if (type === "agreement") {
     try {
-      const agreement = await getAgreementDetails(yagna, id);
+      const agreement = await getAgreementDetails(glm, id);
       printSelectedColumns(agreement, options.columns);
     } catch (err) {
       console.log(chalk.red(`Cannot get agreement details, are you sure the agreement ID is correct?\n`));
@@ -81,7 +81,7 @@ export async function inspectAction(type: string, id: string, options: InspectOp
   }
   if (type === "demand") {
     try {
-      const demand = await getDemandDetails(yagna, id);
+      const demand = await getDemandDetails(glm, id);
       printSelectedColumns(demand, options.columns);
     } catch (err) {
       console.log(
@@ -92,4 +92,5 @@ export async function inspectAction(type: string, id: string, options: InspectOp
       return;
     }
   }
+  await glm.disconnect();
 }
