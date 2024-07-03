@@ -20,5 +20,9 @@
   "dependencies": {
     "@golem-sdk/golem-js": "^3.0.0",
     "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.3"
   }
 }
