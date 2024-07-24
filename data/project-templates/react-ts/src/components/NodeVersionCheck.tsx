@@ -1,30 +1,33 @@
 import { useExecutor } from "@golem-sdk/react";
-import { ProposalFilterFactory } from "@golem-sdk/golem-js";
 import { NodeVersionCheckTask } from "./NodeVersionCheckTask";
 
 export function NodeVersionCheck() {
   const { executor, initialize, isInitialized, isInitializing, terminate, error } = useExecutor({
-    // What do you want to run
-    package: "golem/node:20-alpine",
-
-    // How much you wish to spend
-    budget: 2,
-
-    // How do you want to select market proposals
-    proposalFilter: ProposalFilterFactory.limitPriceFilter({
-      start: 1.0,
-      cpuPerSec: 1.0 / 3600,
-      envPerSec: 1.0 / 3600,
-    }),
-
+    demand: {
+      workload: {
+        imageTag: "golem/node:20-alpine",
+      },
+    },
     // Where you want to spend
     payment: {
-      network: "goerli",
+      network: "holesky",
     },
-
+    market: {
+      // Let's rent the provider for no more than 15 minutes
+      rentHours: 15 / 60,
+      // Let's agree to pay at most 0.5 GLM per hour
+      pricing: {
+        model: "burn-rate",
+        avgGlmPerHour: 0.5,
+      },
+    },
     // Control the execution of tasks
-    maxTaskRetries: 0,
-    taskTimeout: 5 * 60 * 1000,
+    task: {
+      taskTimeout: 5 * 60 * 1000,
+      maxTaskRetries: 0,
+    },
+    // Look at the browser console to see what's happening under the hood
+    enableLogging: true,
   });
 
   return (
@@ -33,7 +36,7 @@ export function NodeVersionCheck() {
       {isInitialized && executor && <NodeVersionCheckTask executor={executor} />}
       {isInitializing && <div>Executor is initializing</div>}
       {!isInitialized && (
-        <button onClick={initialize} className="bg-progress">
+        <button onClick={() => initialize()} className="bg-progress">
           Initialize executor
         </button>
       )}

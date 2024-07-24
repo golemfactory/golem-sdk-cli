@@ -10,8 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@golem-sdk/golem-js": "^3.0.0",
-    "@golem-sdk/react": "^3.0.1",
+    "@golem-sdk/golem-js": "^3.1.0",
+    "@golem-sdk/react": "^4.0.0",
+    "@golem-sdk/task-executor": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

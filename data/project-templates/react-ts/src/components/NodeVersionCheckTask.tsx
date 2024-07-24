@@ -1,10 +1,10 @@
-import { TaskExecutor, useTask, Worker } from "@golem-sdk/react";
-
+import { useTask } from "@golem-sdk/react";
+import type { TaskFunction, TaskExecutor } from "@golem-sdk/task-executor";
 export function NodeVersionCheckTask({ executor }: { executor: TaskExecutor }) {
   const { isRunning, result, run, error } = useTask<string>(executor);
 
-  const getNodeVersionTask: Worker<string> = async (ctx) => {
-    return (await ctx.run("node -v")).stdout?.toString() ?? "No version information";
+  const getNodeVersionTask: TaskFunction<string> = async (exe) => {
+    return (await exe.run("node -v")).stdout?.toString() ?? "No version information";
   };
 
   return (
