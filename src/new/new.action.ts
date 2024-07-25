@@ -56,12 +56,10 @@ async function getTemplate(providedTemplate?: string): Promise<string> {
         { name: "js-node", hint: "Plain Javascript CLI application (CommonJS)" },
         { name: "js-node-esm", hint: "Plain Javascript CLI application (ESM)" },
         {
-          name: "(coming soon) react-js",
+          name: "react-js",
           hint: "React web application (with Vite and plain Javascript)",
-          disabled: true,
         },
-        { name: "(coming soon) react-ts", hint: "React web application (with Vite and Typescript)", disabled: true },
-        // { name: "js-webapp", hint: "Plain Javascript Express based web application" },
+        { name: "react-ts", hint: "React web application (with Vite and Typescript)" },
       ],
     })) as { template: string };
 
