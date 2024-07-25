@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 export function NodeVersionCheckTask({ executor }) {
   const { isRunning, result, run, error } = useTask(executor);
 
-  const getNodeVersionTask = async (ctx) => {
-    return (await ctx.run("node -v")).stdout?.toString() ?? "No version information";
+  const getNodeVersionTask = async (exe) => {
+    return (await exe.run("node -v")).stdout?.toString() ?? "No version information";
   };
 
   return (
