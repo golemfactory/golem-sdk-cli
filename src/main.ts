@@ -16,8 +16,8 @@ program.version(version);
 // });
 
 program
-  .addCommand(manifestCommand)
   .addCommand(newCommand)
+  .addCommand(manifestCommand)
   .addCommand(runOnGolemCommand)
   .addCommand(invoiceCommand)
   .addCommand(inspectCommand)
