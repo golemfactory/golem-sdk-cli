@@ -96,6 +96,10 @@ export function shellProgram(rental: ResourceRental, processContext: ProcessCont
       const result = await rental.getExeUnit().then((exe) => exe.run(command));
       if (result.result !== "Ok") {
         console.error(`Command error: ${result.message}`);
+
+        if (!options.stderr) {
+          console.error(result.stderr?.toString());
+        }
       }
       // TODO: Handle stdout redirect.
       let stdout = result.stdout as string;
