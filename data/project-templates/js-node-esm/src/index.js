@@ -77,7 +77,6 @@ import { GolemNetwork } from "@golem-sdk/golem-js";
       .then((exe) => exe.run(`echo Hello Golem from provider ${exe.provider.name} 👽`))
       .then((res) => console.log(res.stdout))
       .catch((err) => console.error(`Something went wrong:`, err));
-
   } catch (err) {
     console.error("Something went wrong:", err);
   } finally {
