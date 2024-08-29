@@ -1,4 +1,4 @@
-import { NewOptions, newProjectNameError, newProjectNameRegEx } from "./new.options";
+import { newDefaultOptions, NewOptions, newProjectNameError, newProjectNameRegEx } from "./new.options";
 
 import { prompt } from "enquirer";
 import { join } from "path";
@@ -29,16 +29,20 @@ async function getName(providedName: string): Promise<string> {
   return providedName;
 }
 
-async function getVersion(providedVersion?: string): Promise<string> {
+async function getVersion(providedVersion?: string, useDefault = false): Promise<string> {
   if (typeof providedVersion === "string") {
     return providedVersion;
+  }
+
+  if (useDefault) {
+    return newDefaultOptions.appVersion;
   }
 
   const result = (await prompt({
     type: "input",
     name: "version",
     message: "Project version",
-    initial: "1.0.0",
+    initial: newDefaultOptions.appVersion,
   })) as { version: string };
 
   return result.version;
@@ -74,16 +78,20 @@ async function getTemplate(providedTemplate?: string): Promise<string> {
   return providedTemplate;
 }
 
-async function getDescription(providedDescription?: string): Promise<string> {
+async function getDescription(providedDescription?: string, useDefault = false): Promise<string> {
   if (typeof providedDescription === "string") {
     return providedDescription;
+  }
+
+  if (useDefault) {
+    return newDefaultOptions.description;
   }
 
   const result = (await prompt({
     type: "input",
     name: "description",
     message: "Project description",
-    initial: "An unique and awesome application that runs on Golem Network",
+    initial: newDefaultOptions.description,
   })) as { description: string };
 
   return result.description;
@@ -168,8 +176,8 @@ export async function newAction(providedName: string, options: NewOptions) {
     process.exit(1);
   }
 
-  const description = await getDescription(options.description);
-  const version = await getVersion(options.appVersion);
+  const description = await getDescription(options.description, options.yes);
+  const version = await getVersion(options.appVersion, options.yes);
   const author = options.author;
 
   console.log(`Creating a new Golem app in ${projectPath}.`);
