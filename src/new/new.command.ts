@@ -11,6 +11,7 @@ newCommand
   .option("-d, --description <text>", "Description of the project.")
   .option("-a, --author <name>", "Author of the project.") // TODO: try to read it from git config?
   .option("-v, --app-version <version>", "Version of the project.")
+  .option("-y, --yes", 'Automatically answer "yes" to optional prompts that installer might print on the command line')
   .option("--skip-install", "Do not install dependencies.")
   // TODO: implement list-templates?
   // .option("-l, --list-templates", "List available project templates.")
