@@ -79,9 +79,13 @@ import { GolemNetwork } from "@golem-sdk/golem-js";
       .catch((err) => console.error(`Something went wrong:`, err));
   } catch (err) {
     console.error("Something went wrong:", err);
+    throw err;
   } finally {
     // Disconnect from the Golem Network.
     // This will clear the rental pools and finalize and pay all rentals that were created within the Golem Network
     await glm.disconnect();
   }
-})().catch(console.error);
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});
