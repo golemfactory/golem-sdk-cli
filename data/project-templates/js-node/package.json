@@ -14,7 +14,8 @@
     "network",
     "application"
   ],
-  "@golem-sdk/golem-js": "^3.2.0",
-  "dotenv": "^16.4.5",
-  "dependencies": {}
+  "dependencies": {
+    "@golem-sdk/golem-js": "^3.2.0",
+    "dotenv": "^16.4.5"
+  }
 }
