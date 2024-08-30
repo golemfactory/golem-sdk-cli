@@ -85,7 +85,7 @@ import { GolemNetwork, MarketOrderSpec } from "@golem-sdk/golem-js";
     // This will clear the rental pools and finalize and pay all rentals that were created within the Golem Network
     await glm.disconnect();
   }
-})().catch(error => {
+})().catch((error) => {
   console.error(error);
   process.exit(1);
 });
