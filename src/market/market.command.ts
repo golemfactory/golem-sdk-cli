@@ -184,8 +184,11 @@ marketCommand
           }
 
           const displayProposals = offersFound.map((offer) => {
-            const memory = offer.memory;
-            const storage = offer.storage;
+            const memory = offer.memoryGib;
+            const storage = offer.storageGib;
+            const runtimeName = offer.runtimeName;
+            const runtimeVersion = offer.properties["golem.runtime.version"];
+
             return {
               providerId: offer.provider.id,
               providerName: offer.provider.name,
@@ -196,6 +199,8 @@ marketCommand
               cpuThreads: offer.cpuThreads,
               memoryGib: memory ? parseFloat(memory.toFixed(1)) : "N/A",
               storageGib: storage ? parseFloat(storage.toFixed(1)) : "N/A",
+              runtimeName,
+              runtimeVersion,
             };
           });
 
