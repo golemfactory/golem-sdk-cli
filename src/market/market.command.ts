@@ -135,7 +135,10 @@ marketCommand
       if (!maxHourPrice) {
         return true;
       }
-      const hourlyPrice = offer.pricing.start + offer.pricing.cpuSec * 3600 + offer.pricing.envSec * 3600;
+
+      const hourlyPrice =
+        offer.pricing.start + offer.pricing.cpuSec * 3600 * offer.cpuThreads + offer.pricing.envSec * 3600;
+
       return hourlyPrice <= maxHourPrice;
     };
 
