@@ -16,7 +16,10 @@ type MarketScanOptions = {
   paymentNetwork: string;
   paymentDriver: string;
   subnetTag: string;
+  /** @deprecated Use runtimeName instead */
   engine?: string;
+  runtimeName?: string;
+  runtimeVersion?: string;
   capabilities?: string[];
   minMemGib?: string;
   maxMemGib?: string;
@@ -40,6 +43,20 @@ marketCommand
   .addOption(new Option("-k, --yagna-appkey <key>", "Yagna app key to use").env("YAGNA_APPKEY").makeOptionMandatory())
   .option("--yagna-url <url>", "Yagna API URL", "http://127.0.0.1:7465")
   .option("-t, --scan-time <sec>", "Number of seconds to scan the market", "10")
+  .addOption(
+    new Option("--mainnet", "Set options for a scan of the 'mainnet' network")
+      .implies({
+        paymentNetwork: "polygon",
+      })
+      .conflicts("testnet"),
+  )
+  .addOption(
+    new Option("--testnet", "Set options for a scan of the 'testnet' network")
+      .implies({
+        paymentNetwork: "holesky",
+      })
+      .conflicts("mainnet"),
+  )
   .option("--payment-network <name>", "The payment network to use", "polygon")
   .option("--payment-driver <name>", "The payment driver to use", "erc20")
   .option("--subnet-tag <name>", "The Golem Network's subnet to use", "public")
@@ -55,7 +72,9 @@ marketCommand
     "--max-hour-price <price>",
     "The maximum price per hour of work to look for (start price + CPU/sec * 3600 + env/sec * 3600)",
   )
-  .option("--engine <type>", "The runtime that you are interested in", "vm")
+  // NOTE @deprecated --engine option
+  .option("--runtime-name, --engine <type>", "The runtime that you are interested in (--engine is deprecated)", "vm")
+  .option("--runtime-version <version>", "The version of the runtime you are interested in")
   .option("--capabilities [capabilities...]", "List of capabilities listed in the offers", [])
   .option("--provider-id [id...]", "Filter the results to only include proposals from providers with the given ids")
   .option(
@@ -85,7 +104,8 @@ marketCommand
     const minStorageGib = options.minStorageGib !== undefined ? parseFloat(options.minStorageGib) : undefined;
     const maxStorageGib = options.maxStorageGib !== undefined ? parseFloat(options.maxStorageGib) : undefined;
     const maxHourPrice = options.maxHourPrice !== undefined ? parseFloat(options.maxHourPrice) : undefined;
-    const engine = options.engine;
+    const runtimeName = options.runtimeName ?? options.engine;
+    const runtimeVersion = options.runtimeVersion;
     const capabilities = options.capabilities;
     const providerIdFilter = (id: string) => (options.providerId ? options.providerId.includes(id) : true);
     const providerNameFilter = (name: string) => (options.providerName ? options.providerName.includes(name) : true);
@@ -98,7 +118,8 @@ marketCommand
       console.log("Scan time: %d seconds", scanTime);
       console.log("Golem Network subnet tag:", subnetTag);
       console.log("Payment network and driver:", paymentNetwork, paymentDriver);
-      console.log("Golem engine:", engine);
+      console.log("Golem Runtime name:", runtimeName);
+      if (runtimeVersion) console.log("Golem Runtime version:", runtimeVersion);
       console.log("Provider capabilities:", capabilities);
       console.log("Requirements:");
       if (minCpuCores) console.log("  - Minimum number of CPU cores:", minCpuCores);
@@ -145,7 +166,6 @@ marketCommand
     const scanOptions: ScanOptions = {
       workload: {
         capabilities,
-        engine,
         maxCpuCores,
         maxCpuThreads,
         maxMemGib,
@@ -154,6 +174,10 @@ marketCommand
         minCpuThreads,
         minMemGib,
         minStorageGib,
+        runtime: {
+          name: runtimeName,
+          version: runtimeVersion,
+        },
       },
       payment: {
         network: paymentNetwork,
